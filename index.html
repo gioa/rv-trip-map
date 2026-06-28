@@ -3,255 +3,620 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SF → Seattle RV Trip (12 Days)</title>
+<title>SF → Seattle RV Trip Planner</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-#map { height: 100vh; width: 100%; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; }
 
-.legend {
-  background: white; padding: 12px 16px; border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.25); font-size: 13px; line-height: 1.8;
-}
-.legend h4 { margin-bottom: 6px; font-size: 14px; }
-.legend-item { display: flex; align-items: center; gap: 8px; }
-.legend-dot {
-  width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.2); flex-shrink: 0;
+.app { display: flex; height: 100vh; }
+#map { flex: 1; min-width: 0; }
+
+.panel {
+  width: 420px; height: 100vh; overflow-y: auto; background: #fff;
+  box-shadow: 2px 0 12px rgba(0,0,0,.1); z-index: 1000; flex-shrink: 0;
 }
 
-.sidebar {
-  position: absolute; top: 0; right: 0; width: 340px; height: 100vh;
-  background: white; z-index: 1000; overflow-y: auto;
-  box-shadow: -2px 0 12px rgba(0,0,0,.15); display: none;
+.panel-header {
+  position: sticky; top: 0; z-index: 10; background: linear-gradient(135deg, #1a73e8, #0d47a1);
+  color: white; padding: 16px 20px;
 }
-.sidebar.open { display: block; }
-.sidebar-header {
-  position: sticky; top: 0; background: #1a73e8; color: white;
-  padding: 16px; display: flex; justify-content: space-between; align-items: center;
+.panel-header h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.panel-header p { font-size: 12px; opacity: .85; }
+
+.plan-tabs {
+  display: flex; position: sticky; top: 72px; z-index: 10; background: #fff;
+  border-bottom: 2px solid #e0e0e0;
 }
-.sidebar-header h2 { font-size: 16px; font-weight: 600; }
-.sidebar-close { background: none; border: none; color: white; font-size: 22px; cursor: pointer; }
+.plan-tab {
+  flex: 1; padding: 12px 8px; text-align: center; cursor: pointer;
+  font-size: 13px; font-weight: 600; color: #666; border-bottom: 3px solid transparent;
+  transition: all .2s;
+}
+.plan-tab:hover { background: #f5f8ff; }
+.plan-tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
+
+.summary-bar {
+  padding: 12px 20px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0;
+  display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: #555;
+}
+.summary-item { display: flex; align-items: center; gap: 4px; }
+.summary-item strong { color: #333; }
+
 .day-card {
-  padding: 14px 16px; border-bottom: 1px solid #eee; cursor: pointer;
+  padding: 14px 20px; border-bottom: 1px solid #f0f0f0;
   transition: background .15s;
 }
-.day-card:hover { background: #f5f8ff; }
-.day-card h3 { font-size: 14px; color: #1a73e8; margin-bottom: 4px; }
-.day-card .tag {
-  display: inline-block; font-size: 11px; padding: 1px 8px; border-radius: 10px;
-  margin-bottom: 6px;
+.day-card:hover { background: #f8faff; }
+.day-card.skipped { opacity: .45; }
+.day-card.skipped .day-body { display: none; }
+
+.day-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 6px; cursor: pointer;
+}
+.day-icon { font-size: 20px; }
+.day-title { font-size: 14px; font-weight: 600; color: #222; flex: 1; }
+.day-date { font-size: 11px; color: #888; }
+
+.tag {
+  display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: .3px;
 }
 .tag-camp { background: #e8f5e9; color: #2e7d32; }
 .tag-hotel { background: #e3f2fd; color: #1565c0; }
 .tag-sight { background: #fff3e0; color: #e65100; }
-.day-card p { font-size: 13px; color: #555; line-height: 1.5; }
+.tag-drive { background: #f3e5f5; color: #7b1fa2; }
 
-.toggle-btn {
-  position: absolute; top: 12px; right: 12px; z-index: 999;
-  background: white; border: none; padding: 8px 14px; border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,.25); cursor: pointer; font-size: 14px;
+.day-desc { font-size: 12px; color: #555; line-height: 1.5; margin: 6px 0; }
+
+.drive-info {
+  display: flex; align-items: center; gap: 6px; font-size: 11px; color: #7b1fa2;
+  margin: 4px 0 8px; padding: 4px 8px; background: #faf5ff; border-radius: 6px;
+  border: 1px solid #e8d5f5;
 }
-.toggle-btn:hover { background: #f0f0f0; }
 
-@media (max-width: 600px) {
-  .sidebar { width: 100%; }
+.avail-grid {
+  display: flex; gap: 3px; flex-wrap: wrap; margin: 8px 0;
+}
+.avail-cell {
+  width: 42px; height: 36px; border-radius: 6px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; font-size: 9px; font-weight: 600;
+  cursor: default; border: 1px solid transparent;
+}
+.avail-cell .avail-date { font-size: 8px; opacity: .7; }
+.avail-cell .avail-count { font-size: 12px; font-weight: 700; }
+.avail-good { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
+.avail-low { background: #fff8e1; color: #f57f17; border-color: #fff0b3; }
+.avail-none { background: #ffebee; color: #c62828; border-color: #ffcdd2; }
+.avail-unknown { background: #f5f5f5; color: #999; border-color: #e0e0e0; }
+.avail-cell.selected { border: 2px solid #1a73e8; box-shadow: 0 0 0 1px #1a73e8; }
+
+.controls {
+  display: flex; align-items: center; gap: 8px; margin: 8px 0 4px;
+}
+.night-ctrl {
+  display: flex; align-items: center; gap: 2px; background: #f0f0f0; border-radius: 6px;
+  overflow: hidden;
+}
+.night-btn {
+  width: 26px; height: 26px; border: none; background: #e0e0e0; cursor: pointer;
+  font-size: 14px; font-weight: 700; color: #333; display: flex; align-items: center;
+  justify-content: center;
+}
+.night-btn:hover { background: #ccc; }
+.night-val {
+  width: 32px; text-align: center; font-size: 12px; font-weight: 600; color: #333;
+}
+.skip-btn {
+  font-size: 11px; padding: 4px 10px; border-radius: 6px; cursor: pointer;
+  border: 1px solid #ddd; background: #fff; color: #666;
+}
+.skip-btn:hover { background: #f5f5f5; }
+.skip-btn.skipped { background: #ffebee; color: #c62828; border-color: #ef9a9a; }
+
+.book-link {
+  display: inline-block; font-size: 11px; padding: 4px 10px; border-radius: 6px;
+  background: #1a73e8; color: white; text-decoration: none; margin-top: 4px;
+  font-weight: 600;
+}
+.book-link:hover { background: #1557b0; }
+
+.legend {
+  background: white; padding: 10px 14px; border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25); font-size: 12px; line-height: 1.8;
+}
+.legend h4 { margin-bottom: 4px; font-size: 13px; }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot {
+  width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.2); flex-shrink: 0;
+}
+
+.footer {
+  padding: 16px 20px; background: #f8f9fa; border-top: 1px solid #e0e0e0;
+  font-size: 11px; color: #888; line-height: 1.5;
+}
+
+.mobile-toggle {
+  display: none; position: fixed; bottom: 20px; right: 20px; z-index: 1001;
+  width: 50px; height: 50px; border-radius: 50%; border: none;
+  background: #1a73e8; color: white; font-size: 22px; cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
+}
+
+@media (max-width: 768px) {
+  .app { flex-direction: column-reverse; }
+  .panel { width: 100%; height: 55vh; }
+  #map { height: 45vh; }
+  .mobile-toggle { display: block; }
 }
 </style>
 </head>
 <body>
 
-<button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">📋 行程列表</button>
+<div class="app">
+  <div class="panel" id="panel">
+    <div class="panel-header">
+      <h1>🚐 SF → Seattle RV Trip</h1>
+      <p>Interactive Planner · 实时空位 · 点击调整行程</p>
+    </div>
+    <div class="plan-tabs">
+      <div class="plan-tab active" data-plan="A" onclick="switchPlan('A')">方案A: Jul 11出发</div>
+      <div class="plan-tab" data-plan="B" onclick="switchPlan('B')">方案B: Jul 15出发</div>
+    </div>
+    <div class="summary-bar" id="summaryBar"></div>
+    <div id="itinerary"></div>
+    <div class="footer">
+      <strong>预算估算：</strong> ~$1,800–$2,700 · <strong>总里程：</strong> ~2,500 mi<br>
+      空位数据抓取于 2026-06-28 · <span style="color:#2e7d32">●</span> 5+ <span style="color:#f57f17">●</span> 1-4 <span style="color:#c62828">●</span> 0位<br>
+      Oregon/WA 数据来自 ReserveAmerica 和 parks.wa.gov
+    </div>
+  </div>
+  <div id="map"></div>
+</div>
 
-<div id="sidebar" class="sidebar"></div>
-<div id="map"></div>
+<button class="mobile-toggle" onclick="document.getElementById('panel').scrollIntoView({behavior:'smooth'})">📋</button>
 
 <script>
-const stops = [
-  // Start
-  { lat: 37.5485, lng: -121.9886, title: "出发: Fremont", type: "start", day: 0,
-    desc: "出发点。沿 Hwy 101 北上。", icon: "🏠" },
-  // Day 1
-  { lat: 39.4885, lng: -123.7853, title: "Day 1: MacKerricher State Park", type: "camp", day: 1,
-    desc: "海边 camping。Seal watching、沙滩散步。从 Fremont 开 3hr。", icon: "🏕️" },
-  // Avenue of the Giants
-  { lat: 40.3515, lng: -123.9209, title: "途经: Avenue of the Giants", type: "sight", day: 2,
-    desc: "巨杉大道，31英里穿越古老红杉林。必停！", icon: "🌲" },
-  // Day 2-3
-  { lat: 41.3684, lng: -124.0588, title: "Day 2-3: Redwood NP (Elk Prairie)", type: "camp", day: 2,
-    desc: "Elk Prairie / Gold Bluffs Beach camping 两晚。Fern Canyon、Lady Bird Johnson Grove、Roosevelt elk。", icon: "🏕️" },
-  // Fern Canyon
-  { lat: 41.4008, lng: -124.0652, title: "景点: Fern Canyon", type: "sight", day: 3,
-    desc: "50英尺高的蕨类峡谷，像侏罗纪公园。短程徒步。", icon: "🌿" },
-  // Jedediah Smith
-  { lat: 41.7981, lng: -124.1019, title: "途经: Jedediah Smith Redwoods", type: "sight", day: 4,
-    desc: "Howland Hill Road — 车窗擦着红杉过。未铺装路面，慢速通过。", icon: "🌲" },
-  // Day 4
-  { lat: 42.0526, lng: -124.2631, title: "Day 4: Harris Beach State Park", type: "camp", day: 4,
-    desc: "Brookings, OR。海边岩石地貌，Oregon 南端最美营地。进入 Oregon！", icon: "🏕️" },
-  // Samuel H Boardman
-  { lat: 42.1568, lng: -124.3466, title: "景点: Samuel H. Boardman Corridor", type: "sight", day: 5,
-    desc: "12英里海岸线，Natural Bridges、Arch Rock。必停拍照！", icon: "📸" },
-  // Day 5
-  { lat: 43.1220, lng: -124.4080, title: "Day 5: Bullards Beach State Park", type: "camp", day: 5,
-    desc: "Bandon, OR。河口+海边，有 hookups。Face Rock 海蚀柱就在附近。", icon: "🏕️" },
-  // Oregon Dunes
-  { lat: 43.6784, lng: -124.1699, title: "途经: Oregon Dunes", type: "sight", day: 6,
-    desc: "巨大沙丘，可以停下来走走拍照。", icon: "🏜️" },
-  // Cape Perpetua
-  { lat: 44.2812, lng: -124.1087, title: "景点: Cape Perpetua", type: "sight", day: 6,
-    desc: "Thor's Well 雷神之井、Spouting Horn。涨潮时最壮观。", icon: "🌊" },
-  // Day 6
-  { lat: 44.6368, lng: -124.0535, title: "Day 6: Newport 酒店 🏨", type: "hotel", day: 6,
-    desc: "休息日！洗衣+充电。Historic Bayfront 吃海鲜、Oregon Coast Aquarium（亲子首选）、Yaquina Head Lighthouse + 潮池。", icon: "🏨" },
-  // Day 7
-  { lat: 45.7050, lng: -123.9378, title: "Day 7: Nehalem Bay State Park", type: "camp", day: 7,
-    desc: "离 Cannon Beach 20分钟。坐落在4英里长的沙嘴上，三面环水。", icon: "🏕️" },
-  // Cannon Beach
-  { lat: 45.8918, lng: -123.9615, title: "景点: Cannon Beach & Haystack Rock", type: "sight", day: 7,
-    desc: "Oregon 标志性景点。235英尺高的海蚀柱。傍晚沙滩散步看日落。", icon: "🪨" },
-  // Ecola State Park
-  { lat: 45.9217, lng: -123.9752, title: "景点: Ecola State Park", type: "sight", day: 8,
-    desc: "从高处俯瞰 Cannon Beach + Haystack Rock 全景。经典打卡点。", icon: "📸" },
-  // Astoria Column
-  { lat: 46.1826, lng: -123.8183, title: "景点: Astoria Column", type: "sight", day: 8,
-    desc: "360° 俯瞰哥伦比亚河入海口。登 164 级台阶。", icon: "🗼" },
-  // Day 8
-  { lat: 46.2790, lng: -124.0554, title: "Day 8: Cape Disappointment State Park", type: "camp", day: 8,
-    desc: "Long Beach, WA。两座灯塔、海崖步道。WA 最好的海边营地之一。进入 Washington！", icon: "🏕️" },
-  // Ruby Beach
-  { lat: 47.7107, lng: -124.4135, title: "景点: Ruby Beach", type: "sight", day: 9,
-    desc: "海蚀柱+巨大漂流木，Olympic NP 太平洋海岸必看。", icon: "🏖️" },
-  // Day 9
-  { lat: 47.6133, lng: -124.3740, title: "Day 9: Kalaloch Campground (Olympic NP)", type: "camp", day: 9,
-    desc: "太平洋崖边营地，160个位。附近有 Ruby Beach、Beach 4 潮池。无 hookups，有 dump station。", icon: "🏕️" },
-  // Hoh Rainforest
-  { lat: 47.8602, lng: -123.9346, title: "景点: Hoh Rainforest", type: "sight", day: 10,
-    desc: "温带雨林，全球独特生态系统。Hall of Mosses Trail（0.8mi 环线）必走。", icon: "🌧️" },
-  // Hurricane Ridge
-  { lat: 47.9692, lng: -123.4987, title: "景点: Hurricane Ridge", type: "sight", day: 10,
-    desc: "海拔 5,242ft。晴天能看到加拿大温哥华岛。壮观的高山草甸。", icon: "⛰️" },
-  // Day 10
-  { lat: 48.1185, lng: -123.4307, title: "Day 10: Port Angeles 酒店 🏨", type: "hotel", day: 10,
-    desc: "休息日！Olympic NP 北门户城市。可以逛逛小镇、好好休息。", icon: "🏨" },
-  // Sol Duc
-  { lat: 47.9683, lng: -123.8604, title: "景点: Sol Duc Hot Springs", type: "sight", day: 11,
-    desc: "Olympic NP 内天然温泉度假村。泡完温泉上路去 Seattle。$25/人。", icon: "♨️" },
-  // Day 11
-  { lat: 47.6062, lng: -122.3321, title: "Day 11: Seattle 🏨", type: "hotel", day: 11,
-    desc: "终点站！Pike Place Market（扔鱼表演）、Space Needle、Chihuly Garden、海鲜晚餐。", icon: "🏨" },
-  // Return
-  { lat: 41.3099, lng: -122.3106, title: "回程可选: Mt. Shasta 住一晚", type: "sight", day: 12,
-    desc: "I-5 回程中间点。14,179ft 雪山。如果不想一天开 12 小时回家，可以在这里歇脚。", icon: "🏔️" },
+// ============================================================
+// DATA
+// ============================================================
+const plans = {
+  A: { label: '方案A: Jul 11 出发', startDate: new Date(2026, 6, 11) },
+  B: { label: '方案B: Jul 15 出发', startDate: new Date(2026, 6, 15) },
+};
+
+// Availability data (scraped 2026-06-28)
+const avail = {
+  mackerricher: {
+    '07-06':9,'07-07':9,'07-08':8,'07-09':9,'07-10':9,'07-11':9,'07-12':6,
+    '07-13':10,'07-14':8,'07-15':10,'07-16':8,'07-17':9,'07-18':8,'07-19':7,
+    '07-20':6,'07-21':8,'07-22':9,'07-23':8,'07-24':7,'07-25':9,'07-26':6,'07-27':7,
+  },
+  grassy_flat: {
+    '07-10':2,'07-11':1,'07-12':5,'07-13':5,'07-14':5,'07-15':3,'07-16':4,
+    '07-17':3,'07-18':4,'07-19':6,'07-20':5,'07-21':4,'07-22':3,'07-23':2,
+    '07-24':3,'07-25':4,'07-26':5,'07-27':6,
+  },
+  harris_beach: {
+    '07-06':0,'07-07':0,'07-08':3,'07-09':0,'07-10':0,'07-11':0,'07-12':7,
+    '07-13':0,'07-14':2,'07-15':4,'07-16':1,'07-17':0,'07-18':0,'07-19':1,
+    '07-20':0,'07-21':0,'07-22':0,'07-23':0,
+  },
+  bullards_beach: {
+    '07-10':3,'07-11':0,'07-12':10,'07-13':2,'07-14':0,'07-15':0,'07-16':0,
+    '07-17':0,'07-18':4,'07-19':5,'07-20':5,'07-21':2,'07-22':1,'07-23':0,
+  },
+  nehalem_bay: {
+    '07-14':0,'07-15':3,'07-16':2,'07-17':0,'07-18':0,'07-19':3,'07-20':1,
+    '07-21':1,'07-22':1,'07-23':2,'07-24':0,'07-25':0,'07-26':16,'07-27':0,
+  },
+  cape_disappointment: {
+    // Under construction, limited sites reopening Jul 1
+    // Mark as unknown - call (360) 642-3078
+  },
+  kalaloch: {
+    '07-10':0,'07-11':0,'07-12':0,'07-13':0,'07-14':0,'07-15':0,'07-16':0,
+    '07-17':0,'07-18':0,'07-19':0,'07-20':0,'07-21':0,'07-22':0,'07-23':0,
+    '07-24':0,'07-25':0,'07-26':0,'07-27':0,'07-28':0,'07-29':0,'07-30':0,
+  },
+  sol_duc: {
+    '07-15':1,'07-16':2,'07-17':0,'07-18':0,'07-19':1,'07-20':1,'07-21':0,
+    '07-22':2,'07-23':1,'07-24':0,'07-25':0,'07-26':0,'07-27':0,
+  },
+  mora: {
+    '07-12':9,'07-13':2,'07-14':0,'07-15':0,'07-16':0,'07-17':0,'07-18':0,
+    '07-19':0,'07-20':0,'07-21':0,'07-22':0,'07-23':0,
+  },
+};
+
+const bookingLinks = {
+  mackerricher: 'https://www.recreation.gov/camping/campgrounds/233845',
+  grassy_flat: 'https://www.recreation.gov/camping/campgrounds/232245',
+  harris_beach: 'https://oregonstateparks.reserveamerica.com/camping/harris-beach-state-park/r/campgroundDetails.do?contractCode=OR&parkId=405331',
+  bullards_beach: 'https://oregonstateparks.reserveamerica.com/camping/bullards-beach-state-park/r/campgroundDetails.do?contractCode=OR&parkId=402398',
+  nehalem_bay: 'https://oregonstateparks.reserveamerica.com/camping/nehalem-bay-state-park/r/campgroundDetails.do?contractCode=OR&parkId=402191',
+  cape_disappointment: 'https://washington.goingtocamp.com/CapeDisappointmentStatePark',
+  kalaloch: 'https://www.recreation.gov/camping/campgrounds/232464',
+  sol_duc: 'https://www.recreation.gov/camping/campgrounds/251906',
+  mora: 'https://www.recreation.gov/camping/campgrounds/247591',
+};
+
+// Stop definitions with driving info
+const stopDefs = [
+  {
+    id: 'mackerricher', title: 'MacKerricher State Park',
+    subtitle: 'Mendocino 海边 · Seal watching · 沙滩散步',
+    lat: 39.4885, lng: -123.7853, type: 'camp', icon: '🏕️',
+    driveFrom: '从 Fremont 出发', driveTime: '3h 20min', driveMiles: 175,
+    availKey: 'mackerricher', defaultNights: 1,
+    sights: ['途经 Point Reyes (可选停留)'],
+  },
+  {
+    id: 'giants', title: 'Avenue of the Giants',
+    subtitle: '31英里巨杉大道 · 必停',
+    lat: 40.3515, lng: -123.9209, type: 'sight', icon: '🌲',
+    driveFrom: '从 MacKerricher', driveTime: '2h 40min', driveMiles: 130,
+    passThrough: true,
+  },
+  {
+    id: 'grassy_flat', title: 'Grassy Flat (Redwood 区)',
+    subtitle: 'Smith River 河畔 · 离 Jedediah Smith Redwoods 15min',
+    lat: 41.8344, lng: -123.9942, type: 'camp', icon: '🏕️',
+    driveFrom: '从 MacKerricher (经 Avenue of the Giants)', driveTime: '4h 30min', driveMiles: 230,
+    availKey: 'grassy_flat', defaultNights: 2,
+    sights: ['Fern Canyon (50ft蕨类峡谷)', 'Jedediah Smith Redwoods (Howland Hill Road)', 'Lady Bird Johnson Grove'],
+    note: '替代 Gold Bluffs / Elk Prairie (全满)',
+  },
+  {
+    id: 'harris_beach', title: 'Harris Beach State Park',
+    subtitle: 'Brookings, OR · Oregon 南端最美营地',
+    lat: 42.0526, lng: -124.2631, type: 'camp', icon: '🏕️',
+    driveFrom: '从 Grassy Flat', driveTime: '1h 30min', driveMiles: 55,
+    availKey: 'harris_beach', defaultNights: 1,
+    sights: ['Samuel H. Boardman Corridor (12mi 海岸线, Natural Bridges)'],
+  },
+  {
+    id: 'bullards_beach', title: 'Bullards Beach State Park',
+    subtitle: 'Bandon, OR · 河口+海边 · Full hookups',
+    lat: 43.1220, lng: -124.4080, type: 'camp', icon: '🏕️',
+    driveFrom: '从 Harris Beach', driveTime: '2h', driveMiles: 95,
+    availKey: 'bullards_beach', defaultNights: 1,
+    sights: ['Face Rock 海蚀柱', 'Oregon Dunes (可选绕道)'],
+  },
+  {
+    id: 'newport', title: 'Newport 酒店',
+    subtitle: '休息日！洗衣+充电 · Historic Bayfront 海鲜 · Aquarium',
+    lat: 44.6368, lng: -124.0535, type: 'hotel', icon: '🏨',
+    driveFrom: '从 Bullards Beach', driveTime: '2h 30min', driveMiles: 115,
+    defaultNights: 1,
+    sights: ['Cape Perpetua (Thor\'s Well 雷神之井)', 'Yaquina Head Lighthouse + 潮池', 'Oregon Coast Aquarium'],
+  },
+  {
+    id: 'nehalem_bay', title: 'Nehalem Bay State Park',
+    subtitle: '4英里沙嘴 · 离 Cannon Beach 20min',
+    lat: 45.7050, lng: -123.9378, type: 'camp', icon: '🏕️',
+    driveFrom: '从 Newport', driveTime: '2h 30min', driveMiles: 120,
+    availKey: 'nehalem_bay', defaultNights: 1,
+    sights: ['Cannon Beach & Haystack Rock (日落)', 'Ecola State Park (全景俯瞰)'],
+  },
+  {
+    id: 'cape_disappointment', title: 'Cape Disappointment SP',
+    subtitle: 'Long Beach, WA · 两座灯塔 · 施工重开中',
+    lat: 46.2790, lng: -124.0554, type: 'camp', icon: '🏕️',
+    driveFrom: '从 Nehalem Bay', driveTime: '2h 30min', driveMiles: 105,
+    availKey: 'cape_disappointment', defaultNights: 1,
+    sights: ['Astoria Column (360°全景)', 'Columbia River 入海口'],
+    note: '⚠️ 施工翻新中，7/1 部分重开。电话确认: (360) 642-3078',
+  },
+  {
+    id: 'olympic_hotel', title: 'Olympic NP 区域 (酒店/Sol Duc)',
+    subtitle: 'Kalaloch 全满 → Port Angeles/Forks 酒店 或 Sol Duc 温泉',
+    lat: 47.9683, lng: -123.8604, type: 'hotel', icon: '🏨',
+    driveFrom: '从 Cape Disappointment', driveTime: '4h 30min', driveMiles: 210,
+    defaultNights: 2,
+    sights: ['Ruby Beach (海蚀柱+漂流木)', 'Hoh Rainforest (Hall of Mosses)', 'Hurricane Ridge (5242ft)', 'Sol Duc Hot Springs ($25/人)'],
+    note: 'Kalaloch 7-8月全满。Sol Duc 零星1-2位。建议 Port Angeles 酒店住2晚游 Olympic NP',
+    altAvailKeys: ['kalaloch', 'sol_duc', 'mora'],
+  },
+  {
+    id: 'seattle', title: 'Seattle',
+    subtitle: 'Pike Place Market · Space Needle · Chihuly · 海鲜',
+    lat: 47.6062, lng: -122.3321, type: 'hotel', icon: '🏨',
+    driveFrom: '从 Port Angeles', driveTime: '3h', driveMiles: 140,
+    defaultNights: 1,
+    sights: ['Pike Place Market (扔鱼表演)', 'Space Needle', 'Chihuly Garden and Glass'],
+  },
+  {
+    id: 'return', title: '回程: I-5 南下',
+    subtitle: 'Seattle → Fremont (可选 Mt. Shasta 住一晚)',
+    lat: 41.3099, lng: -122.3106, type: 'sight', icon: '🏔️',
+    driveFrom: '从 Seattle 回 Fremont', driveTime: '12h (直达) 或 分两天',
+    driveMiles: 810,
+    defaultNights: 0,
+    note: '建议在 Mt. Shasta 分段过夜（距 Seattle 7h, 距 Fremont 5h）',
+    passThrough: true,
+  },
 ];
 
-// Colors
-const typeColors = { camp: '#2e7d32', hotel: '#1565c0', sight: '#e65100', start: '#9c27b0' };
-const tagClass = { camp: 'tag-camp', hotel: 'tag-hotel', sight: 'tag-sight', start: 'tag-sight' };
-const typeLabel = { camp: 'Camping', hotel: '酒店', sight: '景点', start: '出发' };
+// ============================================================
+// STATE
+// ============================================================
+let currentPlan = 'A';
+let stopState = {}; // { [id]: { nights, skipped } }
 
-// Init map
+function initState() {
+  stopState = {};
+  stopDefs.forEach(s => {
+    stopState[s.id] = { nights: s.defaultNights || 0, skipped: false };
+  });
+}
+initState();
+
+// ============================================================
+// MAP
+// ============================================================
 const map = L.map('map', { zoomControl: true }).setView([43.5, -123.5], 6);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 18,
-  attribution: '&copy; OpenStreetMap contributors'
+  maxZoom: 18, attribution: '&copy; OpenStreetMap'
 }).addTo(map);
 
-// Route line
-const routeStops = stops.filter(s => s.type !== 'sight');
-const routeLine = L.polyline(routeStops.map(s => [s.lat, s.lng]), {
-  color: '#1a73e8', weight: 3, opacity: 0.7, dashArray: '8, 6'
-}).addTo(map);
+const typeColors = { camp: '#2e7d32', hotel: '#1565c0', sight: '#e65100' };
+let mapMarkers = [];
+let routeLine = null;
 
-// Markers
-const markers = [];
-stops.forEach((stop, i) => {
-  const size = stop.type === 'sight' ? 28 : 36;
-  const icon = L.divIcon({
-    className: 'custom-marker',
-    html: `<div style="
-      width:${size}px; height:${size}px; border-radius:50%;
-      background:${typeColors[stop.type]}; border:3px solid white;
-      box-shadow:0 2px 6px rgba(0,0,0,.4);
-      display:flex; align-items:center; justify-content:center;
-      font-size:${size === 36 ? 18 : 14}px; cursor:pointer;
-    ">${stop.icon}</div>`,
-    iconSize: [size, size],
-    iconAnchor: [size/2, size/2],
+function updateMap() {
+  mapMarkers.forEach(m => map.removeLayer(m));
+  mapMarkers = [];
+  if (routeLine) map.removeLayer(routeLine);
+
+  const activeStops = stopDefs.filter(s => !stopState[s.id]?.skipped);
+  const routePoints = activeStops.filter(s => s.type !== 'sight' || s.passThrough).map(s => [s.lat, s.lng]);
+  // Add Fremont start
+  routePoints.unshift([37.5485, -121.9886]);
+  routeLine = L.polyline(routePoints, { color: '#1a73e8', weight: 3, opacity: .7, dashArray: '8,6' }).addTo(map);
+
+  // Fremont marker
+  const startIcon = L.divIcon({
+    className: 'x', html: `<div style="width:32px;height:32px;border-radius:50%;background:#9c27b0;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-size:16px;">🏠</div>`,
+    iconSize:[32,32], iconAnchor:[16,16]
+  });
+  mapMarkers.push(L.marker([37.5485,-121.9886],{icon:startIcon}).addTo(map).bindPopup('<b>出发: Fremont, CA</b>'));
+
+  stopDefs.forEach((stop, i) => {
+    const st = stopState[stop.id];
+    if (st?.skipped) return;
+    const color = typeColors[stop.type] || '#666';
+    const size = stop.type === 'sight' && !stop.passThrough ? 26 : 34;
+    const icon = L.divIcon({
+      className: 'x',
+      html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-size:${size>30?16:13}px;cursor:pointer;">${stop.icon}</div>`,
+      iconSize:[size,size], iconAnchor:[size/2,size/2]
+    });
+    const marker = L.marker([stop.lat, stop.lng], { icon }).addTo(map);
+    const nightsText = (st?.nights||0) > 0 ? ` · ${st.nights}晚` : '';
+    marker.bindPopup(`<div style="max-width:240px;font-size:13px;line-height:1.5;"><strong style="color:${color}">${stop.icon} ${stop.title}</strong>${nightsText}<br><span style="font-size:12px;color:#555">${stop.subtitle}</span></div>`);
+    mapMarkers.push(marker);
+  });
+}
+
+function flyToStop(id) {
+  const s = stopDefs.find(x => x.id === id);
+  if (!s) return;
+  map.flyTo([s.lat, s.lng], 10, { duration: 1 });
+  const idx = stopDefs.indexOf(s);
+  const visibleIdx = stopDefs.filter((x,i) => i <= idx && !stopState[x.id]?.skipped).length;
+  // +1 for Fremont marker
+  if (mapMarkers[visibleIdx]) setTimeout(() => mapMarkers[visibleIdx].openPopup(), 800);
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function getDateStr(date) {
+  const m = String(date.getMonth()+1).padStart(2,'0');
+  const d = String(date.getDate()).padStart(2,'0');
+  return `${m}-${d}`;
+}
+
+function formatDate(date) {
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  return `${date.getMonth()+1}/${date.getDate()} (${days[date.getDay()]})`;
+}
+
+function getAvailClass(n) {
+  if (n === undefined || n === null) return 'avail-unknown';
+  if (n >= 5) return 'avail-good';
+  if (n >= 1) return 'avail-low';
+  return 'avail-none';
+}
+
+function render() {
+  const startDate = new Date(plans[currentPlan].startDate);
+  let currentDate = new Date(startDate);
+  let dayNum = 1;
+  let totalNights = 0;
+  let totalMiles = 0;
+  let campNights = 0;
+  let hotelNights = 0;
+
+  let html = '';
+  stopDefs.forEach((stop, idx) => {
+    const st = stopState[stop.id];
+    const isSkipped = st.skipped;
+
+    // Calculate this stop's date
+    const stopDate = new Date(currentDate);
+    const dateStr = formatDate(stopDate);
+    const nights = isSkipped ? 0 : (st.nights || 0);
+
+    if (!isSkipped) {
+      totalMiles += stop.driveMiles || 0;
+      if (stop.type === 'camp') campNights += nights;
+      else if (stop.type === 'hotel') hotelNights += nights;
+      totalNights += nights;
+    }
+
+    const tagType = stop.type === 'camp' ? 'tag-camp' : stop.type === 'hotel' ? 'tag-hotel' : 'tag-sight';
+    const tagLabel = stop.type === 'camp' ? 'Camping' : stop.type === 'hotel' ? 'Hotel' : '景点/途经';
+    const skippedClass = isSkipped ? 'skipped' : '';
+
+    html += `<div class="day-card ${skippedClass}" id="card-${stop.id}">`;
+    html += `<div class="day-header" onclick="flyToStop('${stop.id}')">`;
+    html += `<span class="day-icon">${stop.icon}</span>`;
+    html += `<span class="day-title">${nights > 0 ? `Day ${dayNum}${nights>1?'-'+(dayNum+nights-1):''}` : '途经'}: ${stop.title}</span>`;
+    if (!isSkipped) html += `<span class="day-date">${dateStr}</span>`;
+    html += `</div>`;
+
+    html += `<div class="day-body">`;
+    html += `<span class="tag ${tagType}">${tagLabel}</span>`;
+
+    // Drive info
+    if (stop.driveFrom) {
+      html += `<div class="drive-info">🚐 ${stop.driveFrom} · <strong>${stop.driveTime}</strong> · ${stop.driveMiles} mi</div>`;
+    }
+
+    html += `<div class="day-desc">${stop.subtitle}`;
+    if (stop.note) html += `<br><em style="color:#c62828">${stop.note}</em>`;
+    html += `</div>`;
+
+    // Sights
+    if (stop.sights && stop.sights.length) {
+      html += `<div style="font-size:11px;color:#666;margin:4px 0;">`;
+      stop.sights.forEach(s => { html += `<div>📍 ${s}</div>`; });
+      html += `</div>`;
+    }
+
+    // Availability grid
+    if (stop.availKey && avail[stop.availKey]) {
+      html += `<div style="font-size:11px;font-weight:600;color:#444;margin:8px 0 4px;">空位 (RV适用):</div>`;
+      html += `<div class="avail-grid">`;
+      const data = avail[stop.availKey];
+      const keys = Object.keys(data).sort();
+      keys.forEach(k => {
+        const v = data[k];
+        const cls = getAvailClass(v);
+        const parts = k.split('-');
+        const label = `${parseInt(parts[0])}/${parseInt(parts[1])}`;
+        // Highlight if this date falls within the stop's stay
+        const cellDate = new Date(2026, parseInt(parts[0])-1, parseInt(parts[1]));
+        let selected = false;
+        for (let n = 0; n < nights; n++) {
+          const d = new Date(stopDate);
+          d.setDate(d.getDate() + n);
+          if (d.getTime() === cellDate.getTime()) selected = true;
+        }
+        html += `<div class="avail-cell ${cls} ${selected?'selected':''}" title="${label}: ${v}位可用"><span class="avail-date">${label}</span><span class="avail-count">${v}</span></div>`;
+      });
+      html += `</div>`;
+      html += `<a class="book-link" href="${bookingLinks[stop.availKey]}" target="_blank">🔗 预订</a> `;
+    }
+
+    // Alt availability (for Olympic area)
+    if (stop.altAvailKeys) {
+      stop.altAvailKeys.forEach(ak => {
+        if (!avail[ak]) return;
+        const name = ak.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+        html += `<div style="font-size:11px;font-weight:600;color:#888;margin:8px 0 2px;">${name} (替代):</div>`;
+        html += `<div class="avail-grid">`;
+        const data = avail[ak];
+        Object.keys(data).sort().forEach(k => {
+          const v = data[k];
+          const cls = getAvailClass(v);
+          const parts = k.split('-');
+          const label = `${parseInt(parts[0])}/${parseInt(parts[1])}`;
+          html += `<div class="avail-cell ${cls}" title="${label}: ${v}位"><span class="avail-date">${label}</span><span class="avail-count">${v}</span></div>`;
+        });
+        html += `</div>`;
+        html += `<a class="book-link" href="${bookingLinks[ak]}" target="_blank" style="background:#666;">🔗 ${name}</a> `;
+      });
+    }
+
+    // Cape Disappointment special
+    if (stop.id === 'cape_disappointment') {
+      html += `<div style="margin:8px 0;padding:8px;background:#fff8e1;border-radius:6px;font-size:11px;color:#e65100;">`;
+      html += `⚠️ 施工中，仅部分营位开放。请致电 <strong>(360) 642-3078</strong> 确认`;
+      html += `</div>`;
+    }
+
+    // Controls
+    if (!stop.passThrough || stop.defaultNights > 0) {
+      html += `<div class="controls">`;
+      html += `<span style="font-size:11px;color:#666;">住宿:</span>`;
+      html += `<div class="night-ctrl">`;
+      html += `<button class="night-btn" onclick="adjNights('${stop.id}',-1)">−</button>`;
+      html += `<span class="night-val">${nights}晚</span>`;
+      html += `<button class="night-btn" onclick="adjNights('${stop.id}',1)">+</button>`;
+      html += `</div>`;
+      html += `<button class="skip-btn ${isSkipped?'skipped':''}" onclick="toggleSkip('${stop.id}')">${isSkipped?'已跳过 ↩':'跳过'}</button>`;
+      html += `</div>`;
+    }
+
+    html += `</div>`; // day-body
+    html += `</div>`; // day-card
+
+    // Advance date
+    if (!isSkipped && nights > 0) {
+      dayNum += nights;
+      currentDate.setDate(currentDate.getDate() + nights);
+    }
   });
 
-  const marker = L.marker([stop.lat, stop.lng], { icon }).addTo(map);
-  marker.bindPopup(`
-    <div style="max-width:260px;font-size:14px;line-height:1.5;">
-      <strong style="color:${typeColors[stop.type]};font-size:15px;">${stop.title}</strong><br>
-      <span class="tag ${tagClass[stop.type]}" style="
-        display:inline-block;font-size:11px;padding:1px 8px;border-radius:10px;margin:4px 0;
-      ">${typeLabel[stop.type]}</span>
-      <p style="margin:6px 0 0;color:#444;">${stop.desc}</p>
-    </div>
-  `);
-  markers.push(marker);
-});
+  document.getElementById('itinerary').innerHTML = html;
+
+  // Summary
+  document.getElementById('summaryBar').innerHTML = `
+    <div class="summary-item">📅 <strong>${totalNights+1}天${totalNights}晚</strong></div>
+    <div class="summary-item">🏕️ <strong>${campNights}晚</strong> camping</div>
+    <div class="summary-item">🏨 <strong>${hotelNights}晚</strong> 酒店</div>
+    <div class="summary-item">🚐 <strong>~${totalMiles} mi</strong></div>
+    <div class="summary-item">📆 ${formatDate(startDate)} 出发</div>
+  `;
+
+  updateMap();
+
+  // Tabs
+  document.querySelectorAll('.plan-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.plan === currentPlan);
+  });
+}
+
+function switchPlan(p) {
+  currentPlan = p;
+  initState();
+  render();
+}
+
+function adjNights(id, delta) {
+  const st = stopState[id];
+  st.nights = Math.max(0, Math.min(5, st.nights + delta));
+  if (st.nights > 0) st.skipped = false;
+  render();
+}
+
+function toggleSkip(id) {
+  stopState[id].skipped = !stopState[id].skipped;
+  render();
+}
 
 // Legend
 const legend = L.control({ position: 'bottomleft' });
 legend.onAdd = function() {
   const div = L.DomUtil.create('div', 'legend');
   div.innerHTML = `
-    <h4>SF → Seattle RV Trip</h4>
-    <div class="legend-item"><div class="legend-dot" style="background:#2e7d32"></div> Camping 营地 (7晚)</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#1565c0"></div> 酒店 Hotel (3晚)</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#e65100"></div> 景点 Sights</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#9c27b0"></div> 出发/回程</div>
+    <h4>图例</h4>
+    <div class="legend-item"><div class="legend-dot" style="background:#2e7d32"></div> Camping</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1565c0"></div> 酒店</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e65100"></div> 景点</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9c27b0"></div> 出发</div>
   `;
   return div;
 };
 legend.addTo(map);
 
-// Sidebar
-function buildSidebar() {
-  const sb = document.getElementById('sidebar');
-  let html = `
-    <div class="sidebar-header">
-      <h2>🚐 12天行程</h2>
-      <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
-    </div>
-  `;
-  stops.forEach((stop, i) => {
-    html += `
-      <div class="day-card" onclick="flyTo(${i})">
-        <h3>${stop.icon} ${stop.title}</h3>
-        <span class="tag ${tagClass[stop.type]}">${typeLabel[stop.type]}</span>
-        <p>${stop.desc}</p>
-      </div>
-    `;
-  });
-  html += `
-    <div style="padding:16px;background:#f9f9f9;font-size:12px;color:#888;border-top:1px solid #eee;">
-      <strong>预算估算：</strong> ~$1,800–$2,700<br>
-      <strong>总里程：</strong> ~2,500 英里<br>
-      <strong>最佳时间：</strong> 7月中 – 8月
-    </div>
-  `;
-  sb.innerHTML = html;
-}
-
-function flyTo(i) {
-  const s = stops[i];
-  map.flyTo([s.lat, s.lng], 11, { duration: 1 });
-  setTimeout(() => markers[i].openPopup(), 800);
-}
-
-function toggleSidebar() {
-  const sb = document.getElementById('sidebar');
-  const btn = document.getElementById('toggleBtn');
-  sb.classList.toggle('open');
-  btn.style.display = sb.classList.contains('open') ? 'none' : 'block';
-}
-
-buildSidebar();
+// Init
+render();
 </script>
 </body>
 </html>
