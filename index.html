@@ -198,6 +198,34 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   box-shadow: 0 0 0 1px rgba(0,0,0,.2); flex-shrink: 0;
 }
 
+.activity-toggle {
+  display: flex; align-items: center; gap: 6px; padding: 6px 10px; margin: 8px 0 4px;
+  background: #e3f2fd; border-radius: 8px; cursor: pointer; border: 1px solid #bbdefb;
+  font-size: 12px; font-weight: 600; color: #1565c0; transition: all .2s;
+}
+.activity-toggle:hover { background: #bbdefb; }
+.activity-toggle .arrow { transition: transform .2s; font-size: 10px; }
+.activity-toggle.open .arrow { transform: rotate(90deg); }
+.activity-panel {
+  display: none; margin: 0 0 8px; padding: 10px 12px; background: #f8fbff;
+  border-radius: 0 0 8px 8px; border: 1px solid #e3f2fd; border-top: none;
+  font-size: 12px; line-height: 1.6; color: #333;
+}
+.activity-panel.open { display: block; }
+.activity-section { margin-bottom: 8px; }
+.activity-section:last-child { margin-bottom: 0; }
+.activity-section-title {
+  font-size: 11px; font-weight: 700; color: #1565c0; margin-bottom: 3px;
+  display: flex; align-items: center; gap: 4px;
+}
+.activity-item {
+  font-size: 11px; color: #444; padding: 2px 0 2px 16px;
+  position: relative;
+}
+.activity-item::before {
+  content: '•'; position: absolute; left: 6px; color: #90caf9;
+}
+
 .footer {
   padding: 16px 20px; background: #f8f9fa; border-top: 1px solid #e0e0e0;
   font-size: 11px; color: #888; line-height: 1.5;
@@ -469,6 +497,180 @@ const photos = {
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/North_face_of_Mount_Shasta_at_sunset-2175.jpg/960px-North_face_of_Mount_Shasta_at_sunset-2175.jpg', cap: 'Mt. Shasta 日落' },
   ],
 };
+
+// Activities & Fishing info per stop
+const activities = {
+  mackerricher: {
+    fishing: [
+      '🐟 Surf fishing: barred surfperch, cabezon, rockfish (沙滩/岩石区)',
+      '🎣 Lake Cleone: 彩虹鳟, crappie (湖内小船/岸钓)',
+      '🎣 Fort Bragg 码头: steelhead, flounder, surfperch',
+      '📋 需要 CA 钓鱼执照',
+    ],
+    activities: [
+      '🦭 Seal watching (营地北端礁石区常有海豹)',
+      '🏖️ Glass Beach (彩色海玻璃, Fort Bragg 北)',
+      '🚶 Haul Road Trail (旧铁路改步道, 6mi 平坦海边)',
+      '🐋 季节性观鲸 (12-4月灰鲸迁徙)',
+    ],
+  },
+  giants: {
+    activities: [
+      '🌲 Avenue of the Giants 31英里巨杉大道自驾',
+      '🚶 Founders Grove (300ft+ 红杉, 短步道)',
+      '📷 Shrine Drive-Thru Tree ($10)',
+    ],
+  },
+  grassy_flat: {
+    fishing: [
+      '🐟 Smith River: 加州最后的野生河, 世界纪录 steelhead (27lb)',
+      '🎣 King Salmon 最重达50lb (秋季最佳)',
+      '🎣 冬季 steelhead: 12月-4月',
+      '🎣 夏季: 溪鳟、虹鳟 (fly fishing 最佳)',
+      '📋 需要 CA 钓鱼执照 + steelhead report card',
+    ],
+    activities: [
+      '🌿 Fern Canyon: 50ft高蕨类墙壁峡谷 (涉水步道)',
+      '🌲 Jedediah Smith Redwoods: Howland Hill Road (未铺装, 巨杉夹道)',
+      '🌲 Stout Memorial Grove: 古红杉环形步道',
+      '🏊 Smith River 游泳 (夏季水温宜人)',
+    ],
+  },
+  harris_beach: {
+    fishing: [
+      '🐟 Surf fishing: barred surfperch, redtail surfperch',
+      '🎣 Brookings jetty fishing: rockfish, lingcod, perch',
+      '🦀 公共码头 Dungeness crab (ring net)',
+      '🚤 Charter boats: lingcod/rockfish/crab combo trips (~$200/人)',
+      '📋 需要 OR 钓鱼执照 (non-resident ~$33/3日)',
+    ],
+    activities: [
+      '🏖️ Samuel H. Boardman Corridor: 12mi 海岸步道+观景台',
+      '🪨 Natural Bridges 天然拱桥 (必看)',
+      '🌊 潮池探索 (低潮时)',
+      '🚶 Indian Sands Trail (海岸悬崖步道)',
+    ],
+  },
+  bullards_beach: {
+    fishing: [
+      '🐟 Coquille River: salmon + steelhead (秋季最佳)',
+      '🎣 Bandon jetty: surfperch, rockfish, lingcod (南北 jetty 均可)',
+      '🏖️ Surf fishing: redtail surfperch (沙滩)',
+      '🦀 Bandon Marsh 螃蟹 (Dungeness crab, ring net)',
+      '📋 需要 OR 钓鱼执照',
+    ],
+    activities: [
+      '🪨 Face Rock 海蚀柱 (日落必拍)',
+      '🏖️ Bandon Beach 沙滩漫步 + 海蚀柱群',
+      '🏠 Coquille River Lighthouse (可参观)',
+      '🐴 骑马沙滩 (Bandon Beach Riding Stables)',
+    ],
+  },
+  newport: {
+    fishing: [
+      '🦀 Yaquina Bay crabbing: Dungeness crab, 每人12只/天',
+      '🎣 公共码头: Bay St. Pier & Abbey St. Pier (免费)',
+      '🚤 Charter deep-sea fishing: halibut, lingcod, rockfish',
+      '🎣 岸钓: surfperch, greenling (Nye Beach 附近)',
+      '📋 需要 OR 钓鱼执照 (crabbing 需要 shellfish license)',
+    ],
+    activities: [
+      '🌊 Cape Perpetua: Thor\'s Well 雷神之井 (涨潮时最壮观)',
+      '🏛️ Oregon Coast Aquarium (2-3h, 家庭友好)',
+      '🔭 Yaquina Head: 灯塔 + 潮池 + 观鲸台',
+      '🦭 Bayfront 海鲜街 + 海狮观赏',
+    ],
+  },
+  nehalem_bay: {
+    fishing: [
+      '🐟 Chinook salmon: 8-10月 (Nehalem River)',
+      '🦀 Nehalem Bay crabbing: Dungeness crab (9-2月最佳)',
+      '🏖️ Surf fishing: surfperch, greenling',
+      '🎣 Ecola State Park 岩钓: rockfish, greenling, cabezon',
+      '📋 需要 OR 钓鱼执照',
+    ],
+    activities: [
+      '🪨 Cannon Beach: Haystack Rock 日落 (步行可达)',
+      '🌊 Ecola State Park: 全景海岸俯瞰 + 步道',
+      '🌲 Oswald West State Park: 原始森林步道到隐秘海滩',
+      '🧀 Tillamook Creamery (20min南, 免费参观+冰淇淋)',
+    ],
+  },
+  cape_disappointment: {
+    fishing: [
+      '🎣 North Jetty 钓鱼: rockfish, lingcod, perch (Columbia River 入海口)',
+      '🦀 Crabbing: Dungeness + red rock crab (全年可, crab pot 12月-9月)',
+      '🐚 Razor clam 挖蛤 (Long Beach, 需要执照+季节限制)',
+      '🦪 Nahcotta 生蚝采集 (Willapa Bay)',
+      '🚤 Charter fishing: salmon, halibut, lingcod (Ilwaco 出发)',
+      '📋 需要 WA 钓鱼执照 + shellfish license',
+    ],
+    activities: [
+      '🏠 Cape Disappointment Lighthouse + North Head Lighthouse (两座灯塔)',
+      '🏛️ Lewis & Clark Interpretive Center (太平洋远征终点)',
+      '🏖️ Long Beach: 28英里连续沙滩 (开车可上沙滩)',
+      '🌊 Astoria Column: 360°全景俯瞰 Columbia River 入海口',
+    ],
+  },
+  olympic_hotel: {
+    fishing: [
+      '🎣 Hoh River: steelhead + salmon (岸钓, 船上游禁钓)',
+      '🎣 Sol Duc River: coho salmon 秋季洄游 (Salmon Cascades 观鱼台)',
+      '🎣 Lake Crescent: 原生 cutthroat trout + Beardslee trout',
+      '📋 国家公园内不需要 WA 钓鱼执照, 但 salmon/steelhead 需要 punch card',
+      '⚠️ Hoh River 上游禁止从船上钓鱼, 仅限岸钓',
+    ],
+    activities: [
+      '🏖️ Ruby Beach: 海蚀柱+漂流木+潮池 (低潮最佳)',
+      '🌲 Hoh Rainforest: Hall of Mosses (0.8mi) + Spruce Trail (1.2mi)',
+      '♨️ Sol Duc Hot Springs: 3个矿泉池 ($19/成人, $15/儿童)',
+      '🏔️ Hurricane Ridge: 5242ft 全景 + 高山草甸步道',
+      '💦 Sol Duc Falls: 壮观瀑布步道 (0.8mi 单程)',
+      '🦌 Roosevelt Elk: Hoh Valley 常见大型麋鹿群',
+    ],
+  },
+  seattle: {
+    fishing: [
+      '🎣 Elliott Bay 码头钓鱼 (Pier 86, 免费公共码头)',
+      '🚤 Puget Sound charter fishing: salmon, halibut, lingcod',
+      '📋 需要 WA 钓鱼执照',
+    ],
+    activities: [
+      '🐟 Pike Place Market: 扔鱼表演 + 美食 + Rachel the Pig',
+      '🎡 Miner\'s Landing Pier 57: 摩天轮 + 旋转木马 + 街机',
+      '🏛️ Seattle Aquarium: 海洋生物 + 海狮 (家庭友好)',
+      '🔭 Space Needle + Chihuly Garden and Glass',
+      '🌊 Waterfront Park: 270+ 免费活动 (夏季音乐会/集市)',
+      '🚢 90min 海湾观光船 (Summer Views Cruise)',
+    ],
+  },
+  return: {
+    fishing: [
+      '🐟 Lake Siskiyou: rainbow trout, brown trout, brook trout, bass',
+      '🎣 1000+ 条 3-5lb 鳟鱼每年春季放流 (trout pen program)',
+      '🎣 Upper Sacramento River: 野生虹鳟 (fly fishing 圣地, Dunsmuir 段最佳)',
+      '🎣 Castle Lake: 原始高山湖 (彩虹鳟)',
+      '⏰ 夏季建议清晨/傍晚出钓',
+      '📋 需要 CA 钓鱼执照',
+    ],
+    activities: [
+      '🏔️ Mt. Shasta 观景 (I-5 沿途多个观景台)',
+      '🏊 Lake Siskiyou: 游泳 + 划船 + 皮划艇 (夏季)',
+      '🛝 Splash Zone 充气水上乐园 (Lake Siskiyou Camp Resort)',
+      '🚶 环湖步道 (多个入口, 适合散步)',
+      '🍺 Mt. Shasta Brewing Company (精酿啤酒, 市中心)',
+    ],
+  },
+};
+
+// Toggle activity panel
+function toggleActivity(stopId) {
+  const btn = document.getElementById('act-toggle-' + stopId);
+  const panel = document.getElementById('act-panel-' + stopId);
+  if (!btn || !panel) return;
+  btn.classList.toggle('open');
+  panel.classList.toggle('open');
+}
 
 // Lightbox state
 let lbPhotos = [];
@@ -760,6 +962,31 @@ function render() {
     if (stop.sights && stop.sights.length) {
       html += `<div style="font-size:11px;color:#666;margin:4px 0;">`;
       stop.sights.forEach(s => { html += `<div>📍 ${s}</div>`; });
+      html += `</div>`;
+    }
+
+    // Activities & Fishing
+    const act = activities[stop.id];
+    if (act) {
+      const hasFishing = act.fishing && act.fishing.length;
+      const hasActivities = act.activities && act.activities.length;
+      const fishCount = hasFishing ? act.fishing.length : 0;
+      const actCount = hasActivities ? act.activities.length : 0;
+      const label = hasFishing ? `🐟 钓鱼 & 活动 (${fishCount + actCount})` : `🎯 活动 (${actCount})`;
+      html += `<div class="activity-toggle" id="act-toggle-${stop.id}" onclick="toggleActivity('${stop.id}')">`;
+      html += `<span class="arrow">▶</span> ${label}`;
+      html += `</div>`;
+      html += `<div class="activity-panel" id="act-panel-${stop.id}">`;
+      if (hasFishing) {
+        html += `<div class="activity-section"><div class="activity-section-title">🐟 钓鱼</div>`;
+        act.fishing.forEach(f => { html += `<div class="activity-item">${f}</div>`; });
+        html += `</div>`;
+      }
+      if (hasActivities) {
+        html += `<div class="activity-section"><div class="activity-section-title">🎯 活动/景点</div>`;
+        act.activities.forEach(a => { html += `<div class="activity-item">${a}</div>`; });
+        html += `</div>`;
+      }
       html += `</div>`;
     }
 
