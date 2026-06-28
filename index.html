@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SF → Seattle RV Trip (12 Days)</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+#map { height: 100vh; width: 100%; }
+
+.legend {
+  background: white; padding: 12px 16px; border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25); font-size: 13px; line-height: 1.8;
+}
+.legend h4 { margin-bottom: 6px; font-size: 14px; }
+.legend-item { display: flex; align-items: center; gap: 8px; }
+.legend-dot {
+  width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.2); flex-shrink: 0;
+}
+
+.sidebar {
+  position: absolute; top: 0; right: 0; width: 340px; height: 100vh;
+  background: white; z-index: 1000; overflow-y: auto;
+  box-shadow: -2px 0 12px rgba(0,0,0,.15); display: none;
+}
+.sidebar.open { display: block; }
+.sidebar-header {
+  position: sticky; top: 0; background: #1a73e8; color: white;
+  padding: 16px; display: flex; justify-content: space-between; align-items: center;
+}
+.sidebar-header h2 { font-size: 16px; font-weight: 600; }
+.sidebar-close { background: none; border: none; color: white; font-size: 22px; cursor: pointer; }
+.day-card {
+  padding: 14px 16px; border-bottom: 1px solid #eee; cursor: pointer;
+  transition: background .15s;
+}
+.day-card:hover { background: #f5f8ff; }
+.day-card h3 { font-size: 14px; color: #1a73e8; margin-bottom: 4px; }
+.day-card .tag {
+  display: inline-block; font-size: 11px; padding: 1px 8px; border-radius: 10px;
+  margin-bottom: 6px;
+}
+.tag-camp { background: #e8f5e9; color: #2e7d32; }
+.tag-hotel { background: #e3f2fd; color: #1565c0; }
+.tag-sight { background: #fff3e0; color: #e65100; }
+.day-card p { font-size: 13px; color: #555; line-height: 1.5; }
+
+.toggle-btn {
+  position: absolute; top: 12px; right: 12px; z-index: 999;
+  background: white; border: none; padding: 8px 14px; border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.25); cursor: pointer; font-size: 14px;
+}
+.toggle-btn:hover { background: #f0f0f0; }
+
+@media (max-width: 600px) {
+  .sidebar { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">📋 行程列表</button>
+
+<div id="sidebar" class="sidebar"></div>
+<div id="map"></div>
+
+<script>
+const stops = [
+  // Start
+  { lat: 37.5485, lng: -121.9886, title: "出发: Fremont", type: "start", day: 0,
+    desc: "出发点。沿 Hwy 101 北上。", icon: "🏠" },
+  // Day 1
+  { lat: 39.4885, lng: -123.7853, title: "Day 1: MacKerricher State Park", type: "camp", day: 1,
+    desc: "海边 camping。Seal watching、沙滩散步。从 Fremont 开 3hr。", icon: "🏕️" },
+  // Avenue of the Giants
+  { lat: 40.3515, lng: -123.9209, title: "途经: Avenue of the Giants", type: "sight", day: 2,
+    desc: "巨杉大道，31英里穿越古老红杉林。必停！", icon: "🌲" },
+  // Day 2-3
+  { lat: 41.3684, lng: -124.0588, title: "Day 2-3: Redwood NP (Elk Prairie)", type: "camp", day: 2,
+    desc: "Elk Prairie / Gold Bluffs Beach camping 两晚。Fern Canyon、Lady Bird Johnson Grove、Roosevelt elk。", icon: "🏕️" },
+  // Fern Canyon
+  { lat: 41.4008, lng: -124.0652, title: "景点: Fern Canyon", type: "sight", day: 3,
+    desc: "50英尺高的蕨类峡谷，像侏罗纪公园。短程徒步。", icon: "🌿" },
+  // Jedediah Smith
+  { lat: 41.7981, lng: -124.1019, title: "途经: Jedediah Smith Redwoods", type: "sight", day: 4,
+    desc: "Howland Hill Road — 车窗擦着红杉过。未铺装路面，慢速通过。", icon: "🌲" },
+  // Day 4
+  { lat: 42.0526, lng: -124.2631, title: "Day 4: Harris Beach State Park", type: "camp", day: 4,
+    desc: "Brookings, OR。海边岩石地貌，Oregon 南端最美营地。进入 Oregon！", icon: "🏕️" },
+  // Samuel H Boardman
+  { lat: 42.1568, lng: -124.3466, title: "景点: Samuel H. Boardman Corridor", type: "sight", day: 5,
+    desc: "12英里海岸线，Natural Bridges、Arch Rock。必停拍照！", icon: "📸" },
+  // Day 5
+  { lat: 43.1220, lng: -124.4080, title: "Day 5: Bullards Beach State Park", type: "camp", day: 5,
+    desc: "Bandon, OR。河口+海边，有 hookups。Face Rock 海蚀柱就在附近。", icon: "🏕️" },
+  // Oregon Dunes
+  { lat: 43.6784, lng: -124.1699, title: "途经: Oregon Dunes", type: "sight", day: 6,
+    desc: "巨大沙丘，可以停下来走走拍照。", icon: "🏜️" },
+  // Cape Perpetua
+  { lat: 44.2812, lng: -124.1087, title: "景点: Cape Perpetua", type: "sight", day: 6,
+    desc: "Thor's Well 雷神之井、Spouting Horn。涨潮时最壮观。", icon: "🌊" },
+  // Day 6
+  { lat: 44.6368, lng: -124.0535, title: "Day 6: Newport 酒店 🏨", type: "hotel", day: 6,
+    desc: "休息日！洗衣+充电。Historic Bayfront 吃海鲜、Oregon Coast Aquarium（亲子首选）、Yaquina Head Lighthouse + 潮池。", icon: "🏨" },
+  // Day 7
+  { lat: 45.7050, lng: -123.9378, title: "Day 7: Nehalem Bay State Park", type: "camp", day: 7,
+    desc: "离 Cannon Beach 20分钟。坐落在4英里长的沙嘴上，三面环水。", icon: "🏕️" },
+  // Cannon Beach
+  { lat: 45.8918, lng: -123.9615, title: "景点: Cannon Beach & Haystack Rock", type: "sight", day: 7,
+    desc: "Oregon 标志性景点。235英尺高的海蚀柱。傍晚沙滩散步看日落。", icon: "🪨" },
+  // Ecola State Park
+  { lat: 45.9217, lng: -123.9752, title: "景点: Ecola State Park", type: "sight", day: 8,
+    desc: "从高处俯瞰 Cannon Beach + Haystack Rock 全景。经典打卡点。", icon: "📸" },
+  // Astoria Column
+  { lat: 46.1826, lng: -123.8183, title: "景点: Astoria Column", type: "sight", day: 8,
+    desc: "360° 俯瞰哥伦比亚河入海口。登 164 级台阶。", icon: "🗼" },
+  // Day 8
+  { lat: 46.2790, lng: -124.0554, title: "Day 8: Cape Disappointment State Park", type: "camp", day: 8,
+    desc: "Long Beach, WA。两座灯塔、海崖步道。WA 最好的海边营地之一。进入 Washington！", icon: "🏕️" },
+  // Ruby Beach
+  { lat: 47.7107, lng: -124.4135, title: "景点: Ruby Beach", type: "sight", day: 9,
+    desc: "海蚀柱+巨大漂流木，Olympic NP 太平洋海岸必看。", icon: "🏖️" },
+  // Day 9
+  { lat: 47.6133, lng: -124.3740, title: "Day 9: Kalaloch Campground (Olympic NP)", type: "camp", day: 9,
+    desc: "太平洋崖边营地，160个位。附近有 Ruby Beach、Beach 4 潮池。无 hookups，有 dump station。", icon: "🏕️" },
+  // Hoh Rainforest
+  { lat: 47.8602, lng: -123.9346, title: "景点: Hoh Rainforest", type: "sight", day: 10,
+    desc: "温带雨林，全球独特生态系统。Hall of Mosses Trail（0.8mi 环线）必走。", icon: "🌧️" },
+  // Hurricane Ridge
+  { lat: 47.9692, lng: -123.4987, title: "景点: Hurricane Ridge", type: "sight", day: 10,
+    desc: "海拔 5,242ft。晴天能看到加拿大温哥华岛。壮观的高山草甸。", icon: "⛰️" },
+  // Day 10
+  { lat: 48.1185, lng: -123.4307, title: "Day 10: Port Angeles 酒店 🏨", type: "hotel", day: 10,
+    desc: "休息日！Olympic NP 北门户城市。可以逛逛小镇、好好休息。", icon: "🏨" },
+  // Sol Duc
+  { lat: 47.9683, lng: -123.8604, title: "景点: Sol Duc Hot Springs", type: "sight", day: 11,
+    desc: "Olympic NP 内天然温泉度假村。泡完温泉上路去 Seattle。$25/人。", icon: "♨️" },
+  // Day 11
+  { lat: 47.6062, lng: -122.3321, title: "Day 11: Seattle 🏨", type: "hotel", day: 11,
+    desc: "终点站！Pike Place Market（扔鱼表演）、Space Needle、Chihuly Garden、海鲜晚餐。", icon: "🏨" },
+  // Return
+  { lat: 41.3099, lng: -122.3106, title: "回程可选: Mt. Shasta 住一晚", type: "sight", day: 12,
+    desc: "I-5 回程中间点。14,179ft 雪山。如果不想一天开 12 小时回家，可以在这里歇脚。", icon: "🏔️" },
+];
+
+// Colors
+const typeColors = { camp: '#2e7d32', hotel: '#1565c0', sight: '#e65100', start: '#9c27b0' };
+const tagClass = { camp: 'tag-camp', hotel: 'tag-hotel', sight: 'tag-sight', start: 'tag-sight' };
+const typeLabel = { camp: 'Camping', hotel: '酒店', sight: '景点', start: '出发' };
+
+// Init map
+const map = L.map('map', { zoomControl: true }).setView([43.5, -123.5], 6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// Route line
+const routeStops = stops.filter(s => s.type !== 'sight');
+const routeLine = L.polyline(routeStops.map(s => [s.lat, s.lng]), {
+  color: '#1a73e8', weight: 3, opacity: 0.7, dashArray: '8, 6'
+}).addTo(map);
+
+// Markers
+const markers = [];
+stops.forEach((stop, i) => {
+  const size = stop.type === 'sight' ? 28 : 36;
+  const icon = L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="
+      width:${size}px; height:${size}px; border-radius:50%;
+      background:${typeColors[stop.type]}; border:3px solid white;
+      box-shadow:0 2px 6px rgba(0,0,0,.4);
+      display:flex; align-items:center; justify-content:center;
+      font-size:${size === 36 ? 18 : 14}px; cursor:pointer;
+    ">${stop.icon}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2],
+  });
+
+  const marker = L.marker([stop.lat, stop.lng], { icon }).addTo(map);
+  marker.bindPopup(`
+    <div style="max-width:260px;font-size:14px;line-height:1.5;">
+      <strong style="color:${typeColors[stop.type]};font-size:15px;">${stop.title}</strong><br>
+      <span class="tag ${tagClass[stop.type]}" style="
+        display:inline-block;font-size:11px;padding:1px 8px;border-radius:10px;margin:4px 0;
+      ">${typeLabel[stop.type]}</span>
+      <p style="margin:6px 0 0;color:#444;">${stop.desc}</p>
+    </div>
+  `);
+  markers.push(marker);
+});
+
+// Legend
+const legend = L.control({ position: 'bottomleft' });
+legend.onAdd = function() {
+  const div = L.DomUtil.create('div', 'legend');
+  div.innerHTML = `
+    <h4>SF → Seattle RV Trip</h4>
+    <div class="legend-item"><div class="legend-dot" style="background:#2e7d32"></div> Camping 营地 (7晚)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1565c0"></div> 酒店 Hotel (3晚)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e65100"></div> 景点 Sights</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9c27b0"></div> 出发/回程</div>
+  `;
+  return div;
+};
+legend.addTo(map);
+
+// Sidebar
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = `
+    <div class="sidebar-header">
+      <h2>🚐 12天行程</h2>
+      <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+    </div>
+  `;
+  stops.forEach((stop, i) => {
+    html += `
+      <div class="day-card" onclick="flyTo(${i})">
+        <h3>${stop.icon} ${stop.title}</h3>
+        <span class="tag ${tagClass[stop.type]}">${typeLabel[stop.type]}</span>
+        <p>${stop.desc}</p>
+      </div>
+    `;
+  });
+  html += `
+    <div style="padding:16px;background:#f9f9f9;font-size:12px;color:#888;border-top:1px solid #eee;">
+      <strong>预算估算：</strong> ~$1,800–$2,700<br>
+      <strong>总里程：</strong> ~2,500 英里<br>
+      <strong>最佳时间：</strong> 7月中 – 8月
+    </div>
+  `;
+  sb.innerHTML = html;
+}
+
+function flyTo(i) {
+  const s = stops[i];
+  map.flyTo([s.lat, s.lng], 11, { duration: 1 });
+  setTimeout(() => markers[i].openPopup(), 800);
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const btn = document.getElementById('toggleBtn');
+  sb.classList.toggle('open');
+  btn.style.display = sb.classList.contains('open') ? 'none' : 'block';
+}
+
+buildSidebar();
+</script>
+</body>
+</html>
