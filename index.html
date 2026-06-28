@@ -122,6 +122,47 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 }
 .book-link:hover { background: #1557b0; }
 
+.photo-strip {
+  display: flex; gap: 6px; margin: 8px 0; overflow-x: auto; padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+.photo-strip::-webkit-scrollbar { height: 4px; }
+.photo-strip::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+.photo-thumb {
+  width: 90px; height: 64px; border-radius: 6px; object-fit: cover; cursor: pointer;
+  flex-shrink: 0; border: 2px solid #e0e0e0; transition: all .2s;
+}
+.photo-thumb:hover { border-color: #1a73e8; transform: scale(1.05); }
+
+.lightbox {
+  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,.88); z-index: 9999; align-items: center; justify-content: center;
+  flex-direction: column;
+}
+.lightbox.open { display: flex; }
+.lightbox-img {
+  max-width: 90vw; max-height: 75vh; border-radius: 8px; object-fit: contain;
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+}
+.lightbox-caption {
+  color: #fff; font-size: 14px; margin-top: 12px; text-align: center;
+  max-width: 80vw; line-height: 1.4;
+}
+.lightbox-close {
+  position: absolute; top: 16px; right: 24px; color: #fff; font-size: 32px;
+  cursor: pointer; background: none; border: none; opacity: .8;
+}
+.lightbox-close:hover { opacity: 1; }
+.lightbox-nav {
+  position: absolute; top: 50%; transform: translateY(-50%); color: #fff;
+  font-size: 36px; cursor: pointer; background: rgba(255,255,255,.15);
+  border: none; border-radius: 50%; width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+}
+.lightbox-nav:hover { background: rgba(255,255,255,.3); }
+.lightbox-prev { left: 16px; }
+.lightbox-next { right: 16px; }
+
 .legend {
   background: white; padding: 10px 14px; border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,.25); font-size: 12px; line-height: 1.8;
@@ -177,6 +218,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 </div>
 
 <button class="mobile-toggle" onclick="document.getElementById('panel').scrollIntoView({behavior:'smooth'})">📋</button>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+  <button class="lightbox-nav lightbox-prev" onclick="navLightbox(-1,event)">&lsaquo;</button>
+  <img class="lightbox-img" id="lightboxImg" src="" alt="">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+  <button class="lightbox-nav lightbox-next" onclick="navLightbox(1,event)">&rsaquo;</button>
+</div>
 
 <script>
 // ============================================================
@@ -242,6 +291,98 @@ const bookingLinks = {
   sol_duc: 'https://www.recreation.gov/camping/campgrounds/251906',
   mora: 'https://www.recreation.gov/camping/campgrounds/247591',
 };
+
+// Photos per stop (Wikimedia Commons + free sources)
+const photos = {
+  mackerricher: [
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/MacKerricher_SP_beach.jpg/800px-MacKerricher_SP_beach.jpg', cap: 'MacKerricher 海滩' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Glass_Beach_Fort_Bragg_3.jpg/800px-Glass_Beach_Fort_Bragg_3.jpg', cap: 'Glass Beach (附近)' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Harbor_Seal_at_MacKerricher_State_Park.jpg/800px-Harbor_Seal_at_MacKerricher_State_Park.jpg', cap: '海豹 Seal watching' },
+  ],
+  giants: [
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Avenue_of_the_Giants.jpg/800px-Avenue_of_the_Giants.jpg', cap: 'Avenue of the Giants' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Chandelier_Tree.jpg/600px-Chandelier_Tree.jpg', cap: 'Drive-Thru Tree' },
+  ],
+  grassy_flat: [
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Fern_Canyon%2C_Prairie_Creek_Redwoods_State_Park.jpg/800px-Fern_Canyon%2C_Prairie_Creek_Redwoods_State_Park.jpg', cap: 'Fern Canyon 蕨类峡谷' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Redwood_National_and_State_Parks.jpg/800px-Redwood_National_and_State_Parks.jpg', cap: 'Redwood NP 红杉林' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Jedediah_Smith_Redwoods_State_Park_-_Howland_Hill_Road.jpg/800px-Jedediah_Smith_Redwoods_State_Park_-_Howland_Hill_Road.jpg', cap: 'Jedediah Smith Redwoods' },
+  ],
+  harris_beach: [
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Harris_Beach_State_Park.jpg/800px-Harris_Beach_State_Park.jpg', cap: 'Harris Beach 海蚀柱' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Samuel_H._Boardman_State_Scenic_Corridor_-_Natural_Bridges.jpg/800px-Samuel_H._Boardman_State_Scenic_Corridor_-_Natural_Bridges.jpg', cap: 'Natural Bridges (Boardman)' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Arch_Rock%2C_Samuel_H._Boardman_State_Scenic_Corridor.jpg/800px-Arch_Rock%2C_Samuel_H._Boardman_State_Scenic_Corridor.jpg', cap: 'Arch Rock' },
+  ],
+  bullards_beach: [
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Face_Rock_-_Bandon%2C_Oregon.jpg/800px-Face_Rock_-_Bandon%2C_Oregon.jpg', cap: 'Face Rock, Bandon' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Coquille_River_Lighthouse.jpg/800px-Coquille_River_Lighthouse.jpg', cap: 'Coquille River Lighthouse' },
+  ],
+  newport: [
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Thor%27s_Well_-_Cape_Perpetua.jpg/800px-Thor%27s_Well_-_Cape_Perpetua.jpg', cap: "Thor's Well 雷神之井" },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Yaquina_Head_Lighthouse_-_panoramio.jpg/800px-Yaquina_Head_Lighthouse_-_panoramio.jpg', cap: 'Yaquina Head Lighthouse' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Newport%2C_Oregon_-_panoramio_%281%29.jpg/800px-Newport%2C_Oregon_-_panoramio_%281%29.jpg', cap: 'Newport Historic Bayfront' },
+  ],
+  nehalem_bay: [
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Haystack_Rock_2%2C_Cannon_Beach%2C_Oregon_-_2010-01.jpg/800px-Haystack_Rock_2%2C_Cannon_Beach%2C_Oregon_-_2010-01.jpg', cap: 'Haystack Rock, Cannon Beach' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Ecola_State_Park.jpg/800px-Ecola_State_Park.jpg', cap: 'Ecola State Park 全景' },
+  ],
+  cape_disappointment: [
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Cape_Disappointment_Lighthouse%2C_Washington.jpg/800px-Cape_Disappointment_Lighthouse%2C_Washington.jpg', cap: 'Cape Disappointment 灯塔' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Astoria_Column_01.jpg/600px-Astoria_Column_01.jpg', cap: 'Astoria Column' },
+  ],
+  olympic_hotel: [
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Ruby_Beach%2C_Olympic_National_Park%2C_Washington.jpg/800px-Ruby_Beach%2C_Olympic_National_Park%2C_Washington.jpg', cap: 'Ruby Beach 海蚀柱' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Hoh_rain_forest_-_Olympic_National_Park.jpg/800px-Hoh_rain_forest_-_Olympic_National_Park.jpg', cap: 'Hoh Rainforest' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Hurricane_Ridge_-_panoramio_%281%29.jpg/800px-Hurricane_Ridge_-_panoramio_%281%29.jpg', cap: 'Hurricane Ridge' },
+  ],
+  seattle: [
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Pike_Place_Market_-_1_%2815628898529%29.jpg/800px-Pike_Place_Market_-_1_%2815628898529%29.jpg', cap: 'Pike Place Market' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Seattle_Kerry_Park_Skyline.jpg/800px-Seattle_Kerry_Park_Skyline.jpg', cap: 'Seattle Skyline + Space Needle' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Chihuly_Garden_and_Glass.jpg/800px-Chihuly_Garden_and_Glass.jpg', cap: 'Chihuly Garden and Glass' },
+  ],
+  return: [
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Mt_Shasta_from_the_south.jpg/800px-Mt_Shasta_from_the_south.jpg', cap: 'Mt. Shasta' },
+  ],
+};
+
+// Lightbox state
+let lbPhotos = [];
+let lbIndex = 0;
+
+function openLightbox(stopId, idx) {
+  lbPhotos = photos[stopId] || [];
+  lbIndex = idx || 0;
+  if (!lbPhotos.length) return;
+  showLbPhoto();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('lightbox-close')) return;
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function navLightbox(dir, e) {
+  if (e) e.stopPropagation();
+  lbIndex = (lbIndex + dir + lbPhotos.length) % lbPhotos.length;
+  showLbPhoto();
+}
+
+function showLbPhoto() {
+  const p = lbPhotos[lbIndex];
+  document.getElementById('lightboxImg').src = p.url;
+  document.getElementById('lightboxCaption').textContent = `${p.cap}  (${lbIndex+1}/${lbPhotos.length})`;
+}
+
+// Keyboard nav for lightbox
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') navLightbox(-1);
+  if (e.key === 'ArrowRight') navLightbox(1);
+});
 
 // Stop definitions with driving info
 const stopDefs = [
@@ -480,6 +621,15 @@ function render() {
     html += `<div class="day-desc">${stop.subtitle}`;
     if (stop.note) html += `<br><em style="color:#c62828">${stop.note}</em>`;
     html += `</div>`;
+
+    // Photos
+    if (photos[stop.id] && photos[stop.id].length) {
+      html += `<div class="photo-strip">`;
+      photos[stop.id].forEach((p, pi) => {
+        html += `<img class="photo-thumb" src="${p.url}" alt="${p.cap}" title="${p.cap}" onclick="openLightbox('${stop.id}',${pi})" loading="lazy">`;
+      });
+      html += `</div>`;
+    }
 
     // Sights
     if (stop.sights && stop.sights.length) {
