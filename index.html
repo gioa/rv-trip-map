@@ -482,12 +482,6 @@ const photos = {
     { url: 'https://upload.wikimedia.org/wikipedia/commons/8/8e/Cape_Disappointment_Lighthouse%2C_Washington.jpg', cap: 'Cape Disappointment 灯塔' },
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/2010-03-19_Astoria_Column_%28Astoria%2C_Oregon%29_125812.jpg/960px-2010-03-19_Astoria_Column_%28Astoria%2C_Oregon%29_125812.jpg', cap: 'Astoria Column' },
   ],
-  olympic_hotel: [
-    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Olympic_National_Park_-_Destruction_Island_from_Ruby_Beach_WA.jpg/960px-Olympic_National_Park_-_Destruction_Island_from_Ruby_Beach_WA.jpg', cap: 'Ruby Beach 海蚀柱' },
-    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Hoh_Rain_Forest_-_54018550762.jpg/960px-Hoh_Rain_Forest_-_54018550762.jpg', cap: 'Hoh Rainforest 苔藓' },
-    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Hurricane_Ridge_mountains_clouds_scenic_Jan_2011_NPS_photo_Dave_Turner_%286%29_%2817302127985%29.jpg/960px-Hurricane_Ridge_mountains_clouds_scenic_Jan_2011_NPS_photo_Dave_Turner_%286%29_%2817302127985%29.jpg', cap: 'Hurricane Ridge' },
-    { url: 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Sol_Duc_Falls_April_1989.jpg', cap: 'Sol Duc Falls 瀑布' },
-  ],
   seattle: [
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Seattle_skyline_panorama_from_Kerry_Park%2C_June_2022.jpg/960px-Seattle_skyline_panorama_from_Kerry_Park%2C_June_2022.jpg', cap: 'Seattle 天际线' },
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Seattle_3.jpg/960px-Seattle_3.jpg', cap: 'Seattle 全景' },
@@ -665,32 +659,6 @@ const activities = {
       '🐚 挖蛤体验: Razor clam 季节时全家挖蛤 (需提前查开放日)',
     ],
   },
-  olympic_hotel: {
-    fishing: [
-      '🎣 Hoh River: steelhead + salmon (岸钓, 船上游禁钓)',
-      '🎣 Sol Duc River: coho salmon 秋季洄游 (Salmon Cascades 观鱼台)',
-      '🎣 Lake Crescent: 原生 cutthroat trout + Beardslee trout',
-      '📋 国家公园内不需要 WA 钓鱼执照, 但 salmon/steelhead 需要 punch card',
-      '⚠️ Hoh River 上游禁止从船上钓鱼, 仅限岸钓',
-    ],
-    activities: [
-      '🏖️ Ruby Beach: 海蚀柱+漂流木+潮池 (低潮最佳)',
-      '🌲 Hoh Rainforest: Hall of Mosses (0.8mi) + Spruce Trail (1.2mi)',
-      '♨️ Sol Duc Hot Springs: 3个矿泉池 ($19/成人, $15/儿童)',
-      '🏔️ Hurricane Ridge: 5242ft 全景 + 高山草甸步道',
-      '💦 Sol Duc Falls: 壮观瀑布步道 (0.8mi 单程)',
-      '🦌 Roosevelt Elk: Hoh Valley 常见大型麋鹿群',
-    ],
-    kids: [
-      '🎖️ Junior Ranger Program: 完成任务册得徽章 (游客中心免费领, 4岁+)',
-      '🌊 Ocean Steward Program: 海洋守护者徽章 (另一套任务册)',
-      '🐙 Ruby Beach/Kalaloch 潮池: 低潮前30min到, 海星+海葵+寄居蟹',
-      '🌲 Hoh Rainforest: 苔藓森林像精灵世界! Hall of Mosses 步道平坦短 (0.8mi)',
-      '♨️ Sol Duc 温泉泡池: 适合小朋友的温水池 ($15/儿童)',
-      '🦌 看麋鹿: Hoh Valley 路边经常有大群 Roosevelt Elk, 近距离观察',
-      '🎒 Discovery Pack: 游客中心借背包 (望远镜+放大镜+手册, 免费)',
-    ],
-  },
   seattle: {
     fishing: [
       '🎣 Elliott Bay 码头钓鱼 (Pier 86, 免费公共码头)',
@@ -855,20 +823,10 @@ const stopDefs = [
     note: '⚠️ 施工翻新中，7/1 部分重开。电话确认: (360) 642-3078',
   },
   {
-    id: 'olympic_hotel', title: 'Olympic NP 区域 (酒店/Sol Duc)',
-    subtitle: 'Kalaloch 全满 → Port Angeles/Forks 酒店 或 Sol Duc 温泉',
-    lat: 47.9683, lng: -123.8604, type: 'hotel', icon: '🏨',
-    driveFrom: '从 Cape Disappointment', driveTime: '4h 30min', driveMiles: 210,
-    defaultNights: 2,
-    sights: ['Ruby Beach (海蚀柱+漂流木)', 'Hoh Rainforest (Hall of Mosses)', 'Hurricane Ridge (5242ft)', 'Sol Duc Hot Springs ($25/人)'],
-    note: 'Kalaloch 7-8月全满。Sol Duc 零星1-2位。建议 Port Angeles 酒店住2晚游 Olympic NP',
-    altAvailKeys: ['kalaloch', 'sol_duc', 'mora'],
-  },
-  {
     id: 'seattle', title: 'Seattle',
     subtitle: 'Pike Place Market · Space Needle · Chihuly · 海鲜',
     lat: 47.6062, lng: -122.3321, type: 'hotel', icon: '🏨',
-    driveFrom: '从 Port Angeles', driveTime: '3h', driveMiles: 140,
+    driveFrom: '从 Cape Disappointment', driveTime: '3h 30min', driveMiles: 185,
     defaultNights: 1,
     sights: ['Pike Place Market (扔鱼表演)', 'Space Needle', 'Chihuly Garden and Glass'],
   },
