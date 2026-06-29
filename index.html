@@ -276,10 +276,6 @@ const plans = {
 // Availability data with per-site detail (scraped 2026-06-28)
 // sites: { name, type: 'rv'|'tent'|'group'|'yurt'|'hall' }
 const avail = {
-  mackerricher: {
-    '07-10':9,'07-11':9,'07-12':6,'07-13':10,'07-14':10,'07-15':10,'07-16':10,
-    '07-17':8,'07-18':8,'07-19':10,'07-20':9,'07-21':8,'07-22':9,
-  },
   harris_beach: {
     '07-06':0,'07-07':0,'07-08':3,'07-09':0,'07-10':0,'07-11':0,'07-12':7,
     '07-13':0,'07-14':2,'07-15':4,'07-16':1,'07-17':0,'07-18':0,'07-19':1,
@@ -294,23 +290,6 @@ const avail = {
 // Detailed per-site availability: which sites are free on which dates
 // Types: S=Standard(tent/small RV), F=Full Hookup(RV), G=Group, Y=Yurt, H=Meeting Hall
 const siteDetail = {
-  mackerricher: {
-    // MacKerricher East Pinewood: all STANDARD NONELECTRIC (no hookups, tent/small RV OK for 20ft van)
-    types: { '001':'S','002':'S','003':'S','004':'S','009':'S','EDU':'G','HAWK':'G','LARK':'G','PICNIC':'G','PLOVER':'G' },
-    sites: {
-      '07-10':['001','002','003','009','EDU','HAWK','LARK','PICNIC','PLOVER'],
-      '07-11':['001','002','003','009','EDU','HAWK','LARK','PICNIC','PLOVER'],
-      '07-12':['003','EDU','HAWK','LARK','PICNIC','PLOVER'],
-      '07-13':['001','002','003','004','009','EDU','HAWK','LARK','PICNIC','PLOVER'],
-      '07-14':['001','002','003','004','009','EDU','HAWK','LARK','PICNIC','PLOVER'],
-      '07-15':['001','002','003','004','009','EDU','HAWK','LARK','PICNIC','PLOVER'],
-      '07-16':['001','002','003','004','009','EDU','HAWK','LARK','PICNIC','PLOVER'],
-      '07-17':['002','003','004','EDU','HAWK','LARK','PICNIC','PLOVER'],
-      '07-18':['002','003','004','EDU','HAWK','LARK','PICNIC','PLOVER'],
-      '07-19':['001','002','003','004','009','EDU','HAWK','LARK','PICNIC','PLOVER'],
-      '07-20':['002','003','004','009','EDU','HAWK','LARK','PICNIC','PLOVER'],
-    },
-  },
   harris_beach: {
     // A-loop=Standard, B-loop=Standard-Full(hookups/RV), C-loop=Standard, D-loop=Standard
     types: { 'A07':'S','A30':'S','A32':'S','B12':'F','B28':'F','B37':'F','B44':'F','B46':'F',
@@ -363,7 +342,6 @@ function findContinuousSites(campKey, startDateStr, nights) {
 }
 
 const bookingLinks = {
-  mackerricher: 'https://www.reservecalifornia.com/Web/#/park/668',
   harris_beach: 'https://oregonstateparks.reserveamerica.com/camping/harris-beach-state-park/r/campgroundDetails.do?contractCode=OR&parkId=405331',
   bullards_beach: 'https://oregonstateparks.reserveamerica.com/camping/bullards-beach-state-park/r/campgroundDetails.do?contractCode=OR&parkId=402398',
 };
@@ -371,9 +349,9 @@ const bookingLinks = {
 // Photos per stop (verified Wikimedia Commons URLs, scraped 2026-06-28)
 const photos = {
   mackerricher: [
-    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/MacKerricher_Beach.jpg/960px-MacKerricher_Beach.jpg', cap: 'MacKerricher 海滩' },
-    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/MacKerricher_State_Park_-_April_2023_-_Sarah_Stierch_05.jpg/960px-MacKerricher_State_Park_-_April_2023_-_Sarah_Stierch_05.jpg', cap: 'MacKerricher State Park' },
-    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Glass_Beach_Fort_Bragg_2.jpg/960px-Glass_Beach_Fort_Bragg_2.jpg', cap: 'Glass Beach (附近)' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Glass_Beach_Fort_Bragg_2.jpg/960px-Glass_Beach_Fort_Bragg_2.jpg', cap: 'Glass Beach 海玻璃' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Mendocino_and_Headlands.jpg/960px-Mendocino_and_Headlands.jpg', cap: 'Mendocino Headlands' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/MacKerricher_Beach.jpg/960px-MacKerricher_Beach.jpg', cap: 'MacKerricher Beach' },
   ],
   giants: [
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Redwood_National_Park%2C_fog_in_the_forest.jpg/960px-Redwood_National_Park%2C_fog_in_the_forest.jpg', cap: 'Redwood 红杉林' },
@@ -682,12 +660,13 @@ document.addEventListener('keydown', e => {
 // Stop definitions with driving info
 const stopDefs = [
   {
-    id: 'mackerricher', title: 'MacKerricher State Park',
-    subtitle: 'Mendocino 海边 · Seal watching · 沙滩散步',
-    lat: 39.4885, lng: -123.7853, type: 'camp', icon: '🏕️',
+    id: 'mackerricher', title: 'Mendocino · Trailborn Hill House',
+    subtitle: 'Mendocino 海边精品酒店 · Junior Suite Ocean View · Glass Beach',
+    lat: 39.3077, lng: -123.7995, type: 'hotel', icon: '🏨',
     driveFrom: '从 Fremont 出发', driveTime: '3h 20min', driveMiles: 175,
-    availKey: 'mackerricher', defaultNights: 2,
-    sights: ['途经 Point Reyes (可选停留)'],
+    defaultNights: 2,
+    sights: ['Glass Beach (彩色海玻璃)', 'MacKerricher State Park (海豹+步道)', 'Mendocino Headlands 海岬步道', 'Skunk Train / Railbike (红杉林小火车)'],
+    note: '已订 Hill House at Trailborn Mendocino (Jul 11-13, $1,081)',
   },
   {
     id: 'giants', title: 'Avenue of the Giants',
