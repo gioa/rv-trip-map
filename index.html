@@ -309,24 +309,6 @@ const avail = {
     '07-10':3,'07-11':0,'07-12':10,'07-13':2,'07-14':0,'07-15':0,'07-16':0,
     '07-17':0,'07-18':4,'07-19':5,'07-20':5,'07-21':2,'07-22':1,'07-23':0,
   },
-  nehalem_bay: {
-    '07-14':0,'07-15':3,'07-16':2,'07-17':0,'07-18':0,'07-19':3,'07-20':1,
-    '07-21':1,'07-22':1,'07-23':2,'07-24':0,'07-25':0,'07-26':16,'07-27':0,
-  },
-  cape_disappointment: {},
-  kalaloch: {
-    '07-10':0,'07-11':0,'07-12':0,'07-13':0,'07-14':0,'07-15':0,'07-16':0,
-    '07-17':0,'07-18':0,'07-19':0,'07-20':0,'07-21':0,'07-22':0,'07-23':0,
-    '07-24':0,'07-25':0,'07-26':0,'07-27':0,'07-28':0,'07-29':0,'07-30':0,
-  },
-  sol_duc: {
-    '07-15':1,'07-16':2,'07-17':0,'07-18':0,'07-19':1,'07-20':1,'07-21':0,
-    '07-22':2,'07-23':1,'07-24':0,'07-25':0,'07-26':0,'07-27':0,
-  },
-  mora: {
-    '07-12':9,'07-13':2,'07-14':0,'07-15':0,'07-16':0,'07-17':0,'07-18':0,
-    '07-19':0,'07-20':0,'07-21':0,'07-22':0,'07-23':0,
-  },
 };
 
 // Detailed per-site availability: which sites are free on which dates
@@ -395,22 +377,6 @@ const siteDetail = {
       '07-22':['A04'],
     },
   },
-  nehalem_bay: {
-    // All Standard (electric+water, no full hookup)
-    types: { 'A08':'S','A25':'S','A33':'S','A41':'S','A44':'S',
-             'B06':'S','B09':'S','B12':'S','B13':'S','B14':'S','B15':'S','B16':'S','B20':'S','B25':'S',
-             'C01':'S','C02':'S','C03':'S','C04':'S','C06':'S','C07':'S','C09':'S','C11':'S','C12':'S','C13':'S','C17':'S' },
-    sites: {
-      '07-15':['A33','A41','A44'],
-      '07-16':['C06','C12'],
-      '07-19':['A25','C07','C17'],
-      '07-20':['A25'],
-      '07-21':['B06'],
-      '07-22':['B13'],
-      '07-23':['B25','C04'],
-      '07-26':['A08','B09','B12','B14','B15','B16','B20','C01','C02','C03','C04','C06','C07','C09','C11','C13'],
-    },
-  },
 };
 
 // Type labels and colors
@@ -439,11 +405,6 @@ const bookingLinks = {
   grassy_flat: 'https://www.recreation.gov/camping/campgrounds/232245',
   harris_beach: 'https://oregonstateparks.reserveamerica.com/camping/harris-beach-state-park/r/campgroundDetails.do?contractCode=OR&parkId=405331',
   bullards_beach: 'https://oregonstateparks.reserveamerica.com/camping/bullards-beach-state-park/r/campgroundDetails.do?contractCode=OR&parkId=402398',
-  nehalem_bay: 'https://oregonstateparks.reserveamerica.com/camping/nehalem-bay-state-park/r/campgroundDetails.do?contractCode=OR&parkId=402191',
-  cape_disappointment: 'https://washington.goingtocamp.com/CapeDisappointmentStatePark',
-  kalaloch: 'https://www.recreation.gov/camping/campgrounds/232464',
-  sol_duc: 'https://www.recreation.gov/camping/campgrounds/251906',
-  mora: 'https://www.recreation.gov/camping/campgrounds/247591',
 };
 
 // Photos per stop (verified Wikimedia Commons URLs, scraped 2026-06-28)
@@ -473,14 +434,10 @@ const photos = {
   newport: [
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Yaquina_Head_Lighthouse%2C_Newport_Oregon.jpg/960px-Yaquina_Head_Lighthouse%2C_Newport_Oregon.jpg', cap: 'Yaquina Head Lighthouse' },
   ],
-  nehalem_bay: [
+  cannon_beach: [
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Cannon_Beach_October_2019_panorama_2.jpg/960px-Cannon_Beach_October_2019_panorama_2.jpg', cap: 'Cannon Beach 全景' },
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Cannon_Beach_October_2019_001.jpg/960px-Cannon_Beach_October_2019_001.jpg', cap: 'Haystack Rock' },
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Indian_Point%2C_Ecola_State_Park%2C_Cannon_Beach%2C_Pacific_Ocean_-_DPLA_-_b97e2b3b883929261b6cd37b644b131e.jpg/960px-Indian_Point%2C_Ecola_State_Park%2C_Cannon_Beach%2C_Pacific_Ocean_-_DPLA_-_b97e2b3b883929261b6cd37b644b131e.jpg', cap: 'Ecola State Park' },
-  ],
-  cape_disappointment: [
-    { url: 'https://upload.wikimedia.org/wikipedia/commons/8/8e/Cape_Disappointment_Lighthouse%2C_Washington.jpg', cap: 'Cape Disappointment 灯塔' },
-    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/2010-03-19_Astoria_Column_%28Astoria%2C_Oregon%29_125812.jpg/960px-2010-03-19_Astoria_Column_%28Astoria%2C_Oregon%29_125812.jpg', cap: 'Astoria Column' },
   ],
   seattle: [
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Seattle_skyline_panorama_from_Kerry_Park%2C_June_2022.jpg/960px-Seattle_skyline_panorama_from_Kerry_Park%2C_June_2022.jpg', cap: 'Seattle 天际线' },
@@ -613,50 +570,31 @@ const activities = {
       '🐙 Undersea Gardens (如开放): 水下观赏窗',
     ],
   },
-  nehalem_bay: {
+  cannon_beach: {
     fishing: [
-      '🐟 Chinook salmon: 8-10月 (Nehalem River)',
-      '🦀 Nehalem Bay crabbing: Dungeness crab (9-2月最佳)',
-      '🏖️ Surf fishing: surfperch, greenling',
+      '🏖️ Surf fishing: surfperch, greenling (Cannon Beach 沙滩)',
       '🎣 Ecola State Park 岩钓: rockfish, greenling, cabezon',
+      '🎣 Nehalem River: Chinook salmon (8-10月)',
+      '🦀 Nehalem Bay crabbing: Dungeness crab (9-2月最佳)',
       '📋 需要 OR 钓鱼执照',
     ],
     activities: [
-      '🪨 Cannon Beach: Haystack Rock 日落 (步行可达)',
-      '🌊 Ecola State Park: 全景海岸俯瞰 + 步道',
+      '🪨 Haystack Rock: 235ft 海蚀柱 + 潮池 + 海鹦 (4-7月繁殖)',
+      '🌊 Hug Point: 砂岩洞穴 + 海边瀑布 + 潮池 (低潮时最佳)',
+      '🌊 Ecola State Park: 全景海岸俯瞰 + Indian Beach 步道',
       '🌲 Oswald West State Park: 原始森林步道到隐秘海滩',
-      '🧀 Tillamook Creamery (20min南, 免费参观+冰淇淋)',
+      '🎨 艺术画廊街: 水彩/铜雕/玻璃艺术 (小镇主街)',
+      '🧀 Tillamook Creamery (30min南, 免费参观+冰淇淋)',
+      '🍺 North Coast Craft Beer Trail (14家精酿)',
     ],
     kids: [
       '🐙 Haystack Rock 潮池: 低潮时走到岩石脚下看海星+海葵+螃蟹 (免费!)',
-      '🐦 Tufted Puffin 观鸟: 4-8月 Haystack Rock 有海鹦繁殖 (带望远镜)',
+      '🐦 Tufted Puffin 观鸟: 4-8月海鹦繁殖, 志愿者借望远镜',
       '🏖️ Cannon Beach 堆沙堡 + 放风筝 (宽阔平坦)',
+      '🌊 Hug Point 玩瀑布: 小朋友在海边瀑布下玩水 (低潮安全)',
       '🧀 Tillamook Creamery: 免费参观奶酪工厂 + 冰淇淋 (小朋友最爱)',
-      '🎮 Seaside Funland Arcade: 游戏厅+碰碰车+迷你高尔夫 (15min 北)',
-    ],
-  },
-  cape_disappointment: {
-    fishing: [
-      '🎣 North Jetty 钓鱼: rockfish, lingcod, perch (Columbia River 入海口)',
-      '🦀 Crabbing: Dungeness + red rock crab (全年可, crab pot 12月-9月)',
-      '🐚 Razor clam 挖蛤 (Long Beach, 需要执照+季节限制)',
-      '🦪 Nahcotta 生蚝采集 (Willapa Bay)',
-      '🚤 Charter fishing: salmon, halibut, lingcod (Ilwaco 出发)',
-      '📋 需要 WA 钓鱼执照 + shellfish license',
-    ],
-    activities: [
-      '🏠 Cape Disappointment Lighthouse + North Head Lighthouse (两座灯塔)',
-      '🏛️ Lewis & Clark Interpretive Center (太平洋远征终点)',
-      '🏖️ Long Beach: 28英里连续沙滩 (开车可上沙滩)',
-      '🌊 Astoria Column: 360°全景俯瞰 Columbia River 入海口',
-    ],
-    kids: [
-      '🏎️ Long Beach Go-Karts: 卡丁车赛道, 弯道带坡度 (全家可玩)',
-      '🪁 World Kite Museum: 25国风筝展览 + 现场做风筝 ($5/人)',
-      '🏖️ Long Beach 沙滩开车: 28mi 沙滩允许车辆驶入! 小朋友超新奇',
-      '🚶 Discovery Trail: 8mi 海滨步道 (铺设平坦, 可骑车/推车)',
-      '🎪 Marsh\'s Free Museum: 古怪收藏品+街机+纪念品 (Long Beach 市中心)',
-      '🐚 挖蛤体验: Razor clam 季节时全家挖蛤 (需提前查开放日)',
+      '🎮 Seaside Funland Arcade: 游戏厅+碰碰车+迷你高尔夫 (15min北)',
+      '🍬 Bruce\'s Candy Kitchen: 看做太妃糖 + 海水太妃 (镇上)',
     ],
   },
   seattle: {
@@ -806,27 +744,19 @@ const stopDefs = [
     sights: ['Cape Perpetua (Thor\'s Well 雷神之井)', 'Yaquina Head Lighthouse + 潮池', 'Oregon Coast Aquarium'],
   },
   {
-    id: 'nehalem_bay', title: 'Nehalem Bay State Park',
-    subtitle: '4英里沙嘴 · 离 Cannon Beach 20min',
-    lat: 45.7050, lng: -123.9378, type: 'camp', icon: '🏕️',
+    id: 'cannon_beach', title: 'Cannon Beach',
+    subtitle: 'National Geographic 世界100最美 · Haystack Rock · 艺术小镇',
+    lat: 45.8918, lng: -123.9615, type: 'hotel', icon: '🏨',
     driveFrom: '从 Newport', driveTime: '2h 30min', driveMiles: 120,
-    availKey: 'nehalem_bay', defaultNights: 1,
-    sights: ['Cannon Beach & Haystack Rock (日落)', 'Ecola State Park (全景俯瞰)'],
-  },
-  {
-    id: 'cape_disappointment', title: 'Cape Disappointment SP',
-    subtitle: 'Long Beach, WA · 两座灯塔 · 施工重开中',
-    lat: 46.2790, lng: -124.0554, type: 'camp', icon: '🏕️',
-    driveFrom: '从 Nehalem Bay', driveTime: '2h 30min', driveMiles: 105,
-    availKey: 'cape_disappointment', defaultNights: 1,
-    sights: ['Astoria Column (360°全景)', 'Columbia River 入海口'],
-    note: '⚠️ 施工翻新中，7/1 部分重开。电话确认: (360) 642-3078',
+    defaultNights: 2,
+    sights: ['Haystack Rock 潮池 + 海鹦 (4-7月)', 'Hug Point 洞穴+瀑布+潮池', 'Ecola State Park 全景俯瞰', 'Tillamook Creamery (30min南, 免费参观+冰淇淋)'],
+    note: 'RV Park 推荐: RV Resort at Cannon Beach (full hookup, 步行到沙滩)',
   },
   {
     id: 'seattle', title: 'Seattle',
     subtitle: 'Pike Place Market · Space Needle · Chihuly · 海鲜',
     lat: 47.6062, lng: -122.3321, type: 'hotel', icon: '🏨',
-    driveFrom: '从 Cape Disappointment', driveTime: '3h 30min', driveMiles: 185,
+    driveFrom: '从 Cannon Beach', driveTime: '4h 30min', driveMiles: 235,
     defaultNights: 2,
     sights: ['Pike Place Market (扔鱼表演)', 'Space Needle', 'Chihuly Garden and Glass'],
   },
