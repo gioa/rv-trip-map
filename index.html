@@ -280,10 +280,6 @@ const avail = {
     '07-10':9,'07-11':9,'07-12':6,'07-13':10,'07-14':10,'07-15':10,'07-16':10,
     '07-17':8,'07-18':8,'07-19':10,'07-20':9,'07-21':8,'07-22':9,
   },
-  grassy_flat: {
-    '07-10':0,'07-11':1,'07-12':5,'07-13':5,'07-14':5,'07-15':3,'07-16':5,
-    '07-17':3,'07-18':4,'07-19':5,'07-20':6,'07-21':4,'07-22':7,
-  },
   harris_beach: {
     '07-06':0,'07-07':0,'07-08':3,'07-09':0,'07-10':0,'07-11':0,'07-12':7,
     '07-13':0,'07-14':2,'07-15':4,'07-16':1,'07-17':0,'07-18':0,'07-19':1,
@@ -313,24 +309,6 @@ const siteDetail = {
       '07-18':['002','003','004','EDU','HAWK','LARK','PICNIC','PLOVER'],
       '07-19':['001','002','003','004','009','EDU','HAWK','LARK','PICNIC','PLOVER'],
       '07-20':['002','003','004','009','EDU','HAWK','LARK','PICNIC','PLOVER'],
-    },
-  },
-  grassy_flat: {
-    // All STANDARD NONELECTRIC
-    types: { '008':'S','010':'S','012':'S','013':'S','014':'S','015':'S','017':'S','019':'S' },
-    sites: {
-      '07-11':['015'],
-      '07-12':['008','013','014','015','019'],
-      '07-13':['010','013','014','015','019'],
-      '07-14':['008','013','014','015','019'],
-      '07-15':['013','017','019'],
-      '07-16':['010','012','013','017','019'],
-      '07-17':['010','012','015'],
-      '07-18':['010','012','014','015'],
-      '07-19':['010','012','013','014','019'],
-      '07-20':['010','012','013','014','015','019'],
-      '07-21':['010','012','014','015'],
-      '07-22':['008','010','012','013','014','015','017'],
     },
   },
   harris_beach: {
@@ -386,7 +364,6 @@ function findContinuousSites(campKey, startDateStr, nights) {
 
 const bookingLinks = {
   mackerricher: 'https://www.recreation.gov/camping/campgrounds/233845',
-  grassy_flat: 'https://www.recreation.gov/camping/campgrounds/232245',
   harris_beach: 'https://oregonstateparks.reserveamerica.com/camping/harris-beach-state-park/r/campgroundDetails.do?contractCode=OR&parkId=405331',
   bullards_beach: 'https://oregonstateparks.reserveamerica.com/camping/bullards-beach-state-park/r/campgroundDetails.do?contractCode=OR&parkId=402398',
 };
@@ -401,10 +378,10 @@ const photos = {
   giants: [
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Redwood_National_Park%2C_fog_in_the_forest.jpg/960px-Redwood_National_Park%2C_fog_in_the_forest.jpg', cap: 'Redwood 红杉林' },
   ],
-  grassy_flat: [
+  trinidad: [
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Fern_Canyon%2C_Prairie_Creek_Redwoods_State_Park%2C_California.jpg/960px-Fern_Canyon%2C_Prairie_Creek_Redwoods_State_Park%2C_California.jpg', cap: 'Fern Canyon 蕨类峡谷' },
-    { url: 'https://upload.wikimedia.org/wikipedia/commons/9/96/Fern_canyon.jpg', cap: 'Fern Canyon 小溪' },
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Stout_Memorial_Grove_in_Jedediah_Smith_Redwoods_State_Park_in_2011_%2822%29.JPG/960px-Stout_Memorial_Grove_in_Jedediah_Smith_Redwoods_State_Park_in_2011_%2822%29.JPG', cap: 'Jedediah Smith Redwoods' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Trinidad_Head_from_Trinidad_State_Beach.jpg/960px-Trinidad_Head_from_Trinidad_State_Beach.jpg', cap: 'Trinidad Head 海岬' },
   ],
   harris_beach: [
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Harris_Beach_State_Park_near_Brookings%2C_Oregon.jpg/960px-Harris_Beach_State_Park_near_Brookings%2C_Oregon.jpg', cap: 'Harris Beach 海景' },
@@ -472,26 +449,29 @@ const activities = {
       '🌲 Founders Grove: 超短步道看世界最高树, 适合所有年龄',
     ],
   },
-  grassy_flat: {
+  trinidad: {
     fishing: [
-      '🐟 Smith River: 加州最后的野生河, 世界纪录 steelhead (27lb)',
-      '🎣 King Salmon 最重达50lb (秋季最佳)',
-      '🎣 冬季 steelhead: 12月-4月',
-      '🎣 夏季: 溪鳟、虹鳟 (fly fishing 最佳)',
-      '📋 需要 CA 钓鱼执照 + steelhead report card',
+      '🐟 Trinidad Pier: rockfish, lingcod, surfperch (码头免费)',
+      '🎣 Trinidad Bay 岸钓: cabezon, greenling (岩石区)',
+      '🎣 Clam Beach surf fishing: redtail surfperch',
+      '🎣 附近 Smith River / Klamath River day trip 可钓 salmon/steelhead',
+      '📋 需要 CA 钓鱼执照',
     ],
     activities: [
-      '🌿 Fern Canyon: 50ft高蕨类墙壁峡谷 (涉水步道)',
-      '🌲 Jedediah Smith Redwoods: Howland Hill Road (未铺装, 巨杉夹道)',
+      '🌿 Fern Canyon: 50ft高蕨类墙壁峡谷 (开车45min, 涉水步道)',
+      '🌲 Jedediah Smith Redwoods: Howland Hill Road (1.5h北, 巨杉夹道)',
       '🌲 Stout Memorial Grove: 古红杉环形步道',
-      '🏊 Smith River 游泳 (夏季水温宜人)',
+      '🏖️ Trinidad State Beach: 隐藏式海湾沙滩, 海蚀柱',
+      '🔭 Trinidad Head Trail: 短步道登海岬, 360度海景',
+      '🦭 Sue-meg State Park (原 Patrick\'s Point): 潮池+海蚀洞+Rim Trail',
     ],
     kids: [
-      '🌲 Trees of Mystery: 巨型 Paul Bunyan 雕像 + SkyTrail 空中缆车穿红杉顶 (Klamath)',
+      '🌲 Trees of Mystery: 巨型 Paul Bunyan 雕像 + SkyTrail 空中缆车穿红杉顶 (Klamath, 40min北)',
       '🌿 Fern Canyon: 像走进侏罗纪! 涉水穿50ft蕨类峡谷 (短平, 小朋友OK)',
-      '🏊 Smith River 夏天水温好, 浅水区玩水+扔石头',
       '🦌 Prairie Creek: 路边常有 Roosevelt Elk 大群, 近距离看',
       '🎖️ Redwood NP Junior Ranger Program: 完成任务册获得徽章 (游客中心免费领)',
+      '🐙 Sue-meg 潮池: 海星+海葵+螃蟹, 比其他地方品种更丰富',
+      '🏖️ Trinidad State Beach: 保护型海湾, 浪小安全, 适合玩沙',
     ],
   },
   harris_beach: {
@@ -717,19 +697,19 @@ const stopDefs = [
     passThrough: true,
   },
   {
-    id: 'grassy_flat', title: 'Grassy Flat (Redwood 区)',
-    subtitle: 'Smith River 河畔 · 离 Jedediah Smith Redwoods 15min',
-    lat: 41.8344, lng: -123.9942, type: 'camp', icon: '🏕️',
-    driveFrom: '从 MacKerricher (经 Avenue of the Giants)', driveTime: '4h 30min', driveMiles: 230,
-    availKey: 'grassy_flat', defaultNights: 2,
-    sights: ['Fern Canyon (50ft蕨类峡谷)', 'Jedediah Smith Redwoods (Howland Hill Road)', 'Lady Bird Johnson Grove'],
-    note: '替代 Gold Bluffs / Elk Prairie (全满)',
+    id: 'trinidad', title: 'Trinidad 小镇',
+    subtitle: '海边小镇 · Redwood NP 南入口 · 评分极高酒店',
+    lat: 41.0593, lng: -124.1434, type: 'hotel', icon: '🏨',
+    driveFrom: '从 MacKerricher (经 Avenue of the Giants)', driveTime: '4h', driveMiles: 210,
+    defaultNights: 2,
+    sights: ['Fern Canyon (50ft蕨类峡谷, 45min北)', 'Jedediah Smith Redwoods (1.5h北)', 'Sue-meg State Park (15min北)', 'Trinidad Head Trail (镇上, 360度海景)'],
+    note: '推荐: View Crest Lodge (⭐9.6/10, 有厨房+热水浴缸) 或 Trinidad Inn (森林套房)',
   },
   {
     id: 'harris_beach', title: 'Harris Beach State Park',
     subtitle: 'Brookings, OR · Oregon 南端最美营地',
     lat: 42.0526, lng: -124.2631, type: 'camp', icon: '🏕️',
-    driveFrom: '从 Grassy Flat', driveTime: '1h 30min', driveMiles: 55,
+    driveFrom: '从 Trinidad', driveTime: '2h', driveMiles: 90,
     availKey: 'harris_beach', defaultNights: 1,
     sights: ['Samuel H. Boardman Corridor (12mi 海岸线, Natural Bridges)'],
   },
