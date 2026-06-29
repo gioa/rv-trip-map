@@ -609,6 +609,68 @@ const activities = {
   },
 };
 
+// Points of Interest with coordinates (shown as small markers on map)
+const pois = {
+  mackerricher: [
+    { name: 'Glass Beach', lat: 39.4520, lng: -123.8153, icon: '💎' },
+    { name: 'MacKerricher State Park', lat: 39.4885, lng: -123.7853, icon: '🦭' },
+    { name: 'Mendocino Headlands', lat: 39.3077, lng: -123.8050, icon: '🌊' },
+    { name: 'Skunk Train (Fort Bragg)', lat: 39.4457, lng: -123.8050, icon: '🚂' },
+  ],
+  giants: [
+    { name: 'Founders Grove', lat: 40.3515, lng: -123.9209, icon: '🌲' },
+    { name: 'Shrine Drive-Thru Tree', lat: 40.2683, lng: -123.8760, icon: '🚗' },
+  ],
+  trinidad: [
+    { name: 'Fern Canyon', lat: 41.4011, lng: -124.0653, icon: '🌿' },
+    { name: 'Prairie Creek (Elk)', lat: 41.3755, lng: -124.0265, icon: '🦌' },
+    { name: 'Trinidad Head Trail', lat: 41.0571, lng: -124.1510, icon: '🔭' },
+    { name: 'Trinidad State Beach', lat: 41.0530, lng: -124.1490, icon: '🏖️' },
+    { name: 'Sue-meg State Park', lat: 41.1325, lng: -124.1627, icon: '🐙' },
+    { name: 'Trees of Mystery', lat: 41.5290, lng: -124.0833, icon: '🌲' },
+  ],
+  harris_beach: [
+    { name: 'Natural Bridges', lat: 42.1387, lng: -124.3525, icon: '🪨' },
+    { name: 'Indian Sands Trail', lat: 42.1560, lng: -124.3560, icon: '🚶' },
+    { name: 'Samuel H. Boardman', lat: 42.1500, lng: -124.3500, icon: '🏖️' },
+    { name: 'Harris Beach', lat: 42.0526, lng: -124.2631, icon: '🌅' },
+  ],
+  bullards_beach: [
+    { name: 'Face Rock', lat: 43.0960, lng: -124.4230, icon: '🪨' },
+    { name: 'Bandon Beach', lat: 43.1050, lng: -124.4250, icon: '🏖️' },
+    { name: 'Coquille River Lighthouse', lat: 43.1196, lng: -124.4225, icon: '🏠' },
+  ],
+  newport: [
+    { name: "Cape Perpetua (Thor's Well)", lat: 44.2812, lng: -124.1095, icon: '🌊' },
+    { name: 'Yaquina Head Lighthouse', lat: 44.6766, lng: -124.0790, icon: '🔭' },
+    { name: 'Oregon Coast Aquarium', lat: 44.6175, lng: -124.0469, icon: '🐙' },
+    { name: 'Bayfront 海鲜街', lat: 44.6316, lng: -124.0520, icon: '🦭' },
+  ],
+  cannon_beach: [
+    { name: 'Tillamook Creamery', lat: 45.4574, lng: -123.8426, icon: '🧀' },
+    { name: 'Haystack Rock', lat: 45.8841, lng: -123.9690, icon: '🪨' },
+    { name: 'Ecola State Park', lat: 45.9192, lng: -123.9740, icon: '🌊' },
+    { name: 'Hug Point', lat: 45.8573, lng: -123.9627, icon: '🌊' },
+  ],
+  seattle: [
+    { name: 'Pike Place Market', lat: 47.6097, lng: -122.3422, icon: '🐟' },
+    { name: 'Space Needle', lat: 47.6205, lng: -122.3493, icon: '🔭' },
+    { name: 'Chihuly Garden', lat: 47.6206, lng: -122.3509, icon: '🎨' },
+    { name: 'Museum of Flight', lat: 47.5180, lng: -122.2964, icon: '✈️' },
+    { name: 'Ballard Locks', lat: 47.6655, lng: -122.3975, icon: '🐟' },
+    { name: 'Pier 57 摩天轮', lat: 47.6062, lng: -122.3421, icon: '🎡' },
+  ],
+  rainier: [
+    { name: 'Paradise', lat: 46.7853, lng: -121.7353, icon: '🏔️' },
+    { name: 'Myrtle Falls', lat: 46.7870, lng: -121.7420, icon: '💦' },
+    { name: 'Longmire Museum', lat: 46.7488, lng: -121.8117, icon: '🏛️' },
+  ],
+  return: [
+    { name: 'Mt. Shasta', lat: 41.3099, lng: -122.3106, icon: '🏔️' },
+    { name: 'Lake Siskiyou', lat: 41.2748, lng: -122.3780, icon: '🏊' },
+  ],
+};
+
 // Toggle activity panel
 function toggleActivity(stopId) {
   const btn = document.getElementById('act-toggle-' + stopId);
@@ -665,23 +727,23 @@ const stopDefs = [
     lat: 39.3077, lng: -123.7995, type: 'hotel', icon: '🏨',
     driveFrom: '从 Fremont 出发', driveTime: '3h 20min', driveMiles: 175,
     defaultNights: 2,
-    sights: ['Glass Beach (彩色海玻璃)', 'MacKerricher State Park (海豹+步道)', 'Mendocino Headlands 海岬步道', 'Skunk Train / Railbike (红杉林小火车)'],
+    sights: ['🕐 到达当天: Glass Beach 海玻璃 (酒店15min北)', '🕐 到达当天: MacKerricher State Park 海豹+步道 (酒店20min北)', '🕐 第二天上午: Mendocino Headlands 海岬步道 (酒店旁)', '🕐 第二天上午: Skunk Train / Railbike 红杉林小火车 (需预约, Fort Bragg)'],
     note: '已订 Hill House at Trailborn Mendocino (Jul 11-13, $1,081)',
   },
   {
     id: 'giants', title: 'Avenue of the Giants',
     subtitle: '31英里巨杉大道 · 必停',
     lat: 40.3515, lng: -123.9209, type: 'sight', icon: '🌲',
-    driveFrom: '从 MacKerricher', driveTime: '2h 40min', driveMiles: 130,
+    driveFrom: '从 Mendocino', driveTime: '2h 40min', driveMiles: 130,
     passThrough: true,
   },
   {
     id: 'trinidad', title: 'Trinidad 小镇',
     subtitle: '海边小镇 · Redwood NP 南入口 · 评分极高酒店',
     lat: 41.0593, lng: -124.1434, type: 'hotel', icon: '🏨',
-    driveFrom: '从 MacKerricher (经 Avenue of the Giants)', driveTime: '4h', driveMiles: 210,
+    driveFrom: '从 Mendocino (经 Avenue of the Giants)', driveTime: '4h', driveMiles: 210,
     defaultNights: 2,
-    sights: ['Fern Canyon (50ft蕨类峡谷, 45min北)', 'Jedediah Smith Redwoods (1.5h北)', 'Sue-meg State Park (15min北)', 'Trinidad Head Trail (镇上, 360度海景)'],
+    sights: ['🕐 到达途中: Avenue of the Giants 巨杉大道 (路上顺路)', '🕐 第二天全天: Fern Canyon 蕨类峡谷 (45min北, 半天)', '🕐 第二天全天: Prairie Creek Elk 草原麋鹿 (Fern Canyon 附近)', '🕐 到达当天傍晚: Trinidad Head Trail 海岬360度海景 (镇上)', '🕐 到达当天傍晚: Trinidad State Beach 沙滩 (镇上)', '🕐 第二天: Sue-meg State Park 潮池+Rim Trail (15min北)'],
     note: '推荐: View Crest Lodge (⭐9.6/10, 有厨房+热水浴缸) 或 Trinidad Inn (森林套房)',
   },
   {
@@ -690,7 +752,7 @@ const stopDefs = [
     lat: 42.0526, lng: -124.2631, type: 'hotel', icon: '🏨',
     driveFrom: '从 Trinidad', driveTime: '2h', driveMiles: 90,
     defaultNights: 2,
-    sights: ['Samuel H. Boardman Corridor (12mi 海岸线, Natural Bridges)'],
+    sights: ['🕐 到达途中: Samuel H. Boardman Corridor 12mi海岸 (从 Trinidad 来路上!)', '🕐 途中必停: Natural Bridges 天然拱桥', '🕐 途中必停: Indian Sands Trail 海岸悬崖', '🕐 到达当天傍晚: Harris Beach 潮池+日落'],
     note: '已订 Oceanfront Inn, Brookings (Jul 15-16)',
   },
   {
@@ -699,7 +761,7 @@ const stopDefs = [
     lat: 43.1220, lng: -124.4080, type: 'camp', icon: '🏕️',
     driveFrom: '从 Harris Beach', driveTime: '2h', driveMiles: 95,
     availKey: 'bullards_beach', defaultNights: 1,
-    sights: ['Face Rock 海蚀柱', 'Oregon Dunes (可选绕道)'],
+    sights: ['🕐 到达途中: Face Rock Viewpoint 海蚀柱群 (Bandon, 路上)', '🕐 到达当天: Bandon Beach 沙滩漫步+堆沙堡', '🕐 到达当天: Coquille River Lighthouse 灯塔'],
   },
   {
     id: 'newport', title: 'Newport 酒店',
@@ -707,7 +769,7 @@ const stopDefs = [
     lat: 44.6368, lng: -124.0535, type: 'hotel', icon: '🏨',
     driveFrom: '从 Bullards Beach', driveTime: '2h 30min', driveMiles: 115,
     defaultNights: 1,
-    sights: ['Cape Perpetua (Thor\'s Well 雷神之井)', 'Yaquina Head Lighthouse + 潮池', 'Oregon Coast Aquarium'],
+    sights: ['🕐 到达途中: Cape Perpetua Thor\'s Well 雷神之井 (涨潮时!)', '🕐 到达当天: Yaquina Head Lighthouse + 潮池', '🕐 到达当天: Oregon Coast Aquarium (2-3h, 家庭必去)', '🕐 到达当天: Bayfront 海鲜街 + 看海狮'],
   },
   {
     id: 'cannon_beach', title: 'Cannon Beach',
@@ -715,7 +777,7 @@ const stopDefs = [
     lat: 45.8918, lng: -123.9615, type: 'hotel', icon: '🏨',
     driveFrom: '从 Newport', driveTime: '2h 30min', driveMiles: 120,
     defaultNights: 2,
-    sights: ['Haystack Rock 潮池 + 海鹦 (4-7月)', 'Hug Point 洞穴+瀑布+潮池', 'Ecola State Park 全景俯瞰', 'Tillamook Creamery (30min南, 免费参观+冰淇淋)'],
+    sights: ['🕐 到达途中: Tillamook Creamery 奶酪工厂+冰淇淋 (路上顺路!)', '🕐 到达当天傍晚: Haystack Rock 潮池+海鹦 (低潮时最佳)', '🕐 第二天上午: Ecola State Park 全景俯瞰', '🕐 第二天下午: Hug Point 洞穴+瀑布+潮池 (低潮时)'],
     note: 'RV Park 推荐: RV Resort at Cannon Beach (full hookup, 步行到沙滩)',
   },
   {
@@ -724,7 +786,7 @@ const stopDefs = [
     lat: 47.6062, lng: -122.3321, type: 'hotel', icon: '🏨',
     driveFrom: '从 Cannon Beach', driveTime: '4h 30min', driveMiles: 235,
     defaultNights: 2,
-    sights: ['Pike Place Market (扔鱼表演)', 'Space Needle', 'Chihuly Garden and Glass'],
+    sights: ['🕐 第一天: Pike Place Market 扔鱼表演+午餐', '🕐 第一天下午: Space Needle + Chihuly Garden and Glass', '🕐 第一天傍晚: Waterfront Pier 57 摩天轮', '🕐 第二天: Museum of Flight / MoPOP (选一)', '🕐 第二天: Ballard Locks 水闸看三文鱼 (免费)'],
   },
   {
     id: 'rainier', title: 'Mt. Rainier National Park',
@@ -732,7 +794,7 @@ const stopDefs = [
     lat: 46.7856, lng: -121.7353, type: 'sight', icon: '🏔️',
     driveFrom: '从 Seattle', driveTime: '2h 30min', driveMiles: 100,
     defaultNights: 1,
-    sights: ['Paradise: 野花草甸 + Skyline Trail', 'Myrtle Falls 瀑布 (步行0.5mi)', 'Nisqually Glacier 冰川观景台', 'Longmire Museum 历史区'],
+    sights: ['🕐 到达当天: Paradise 野花草甸 + Skyline Trail (早到避人潮)', '🕐 到达当天: Myrtle Falls 瀑布 (Paradise 步行0.5mi)', '🕐 到达途中: Longmire Museum 历史区 (进山路上)'],
     note: 'Cougar Rock 营地7月全满。建议住 Ashford/Packwood 镇酒店或 RV Park。周中去 Paradise 避开人潮',
   },
   {
@@ -806,6 +868,22 @@ function updateMap() {
     marker.bindPopup(`<div style="max-width:240px;font-size:13px;line-height:1.5;"><strong style="color:${color}">${stop.icon} ${stop.title}</strong>${nightsText}<br><span style="font-size:12px;color:#555">${stop.subtitle}</span></div>`);
     marker.on('click', () => scrollToCard(stop.id));
     mapMarkers.push(marker);
+
+    // POI markers for this stop
+    const stopPois = pois[stop.id];
+    if (stopPois) {
+      stopPois.forEach(poi => {
+        const poiIcon = L.divIcon({
+          className: 'x',
+          html: `<div style="width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid ${color};box-shadow:0 1px 4px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;">${poi.icon}</div>`,
+          iconSize:[22,22], iconAnchor:[11,11]
+        });
+        const poiMarker = L.marker([poi.lat, poi.lng], { icon: poiIcon }).addTo(map);
+        poiMarker.bindPopup(`<div style="font-size:12px;line-height:1.4;"><strong>${poi.icon} ${poi.name}</strong><br><span style="color:${color};font-size:11px;">📍 ${stop.title} 周边</span></div>`);
+        poiMarker.on('click', () => scrollToCard(stop.id));
+        mapMarkers.push(poiMarker);
+      });
+    }
   });
 }
 
