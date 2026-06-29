@@ -443,6 +443,11 @@ const photos = {
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Seattle_skyline_panorama_from_Kerry_Park%2C_June_2022.jpg/960px-Seattle_skyline_panorama_from_Kerry_Park%2C_June_2022.jpg', cap: 'Seattle 天际线' },
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Seattle_3.jpg/960px-Seattle_3.jpg', cap: 'Seattle 全景' },
   ],
+  rainier: [
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Mount_Rainier_from_the_Silver_Queen_Peak.jpg/960px-Mount_Rainier_from_the_Silver_Queen_Peak.jpg', cap: 'Mt. Rainier 雪山' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Wildflowers_at_Paradise%2C_Mount_Rainier_August_2014_-_01.jpg/960px-Wildflowers_at_Paradise%2C_Mount_Rainier_August_2014_-_01.jpg', cap: 'Paradise 野花草甸' },
+    { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Myrtle_Falls_and_Mount_Rainier_in_August.jpg/960px-Myrtle_Falls_and_Mount_Rainier_in_August.jpg', cap: 'Myrtle Falls 瀑布' },
+  ],
   return: [
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Mount_Shasta%2C_Lake_Siskiyou%2C_SW_view.jpg/960px-Mount_Shasta%2C_Lake_Siskiyou%2C_SW_view.jpg', cap: 'Mt. Shasta' },
     { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/North_face_of_Mount_Shasta_at_sunset-2175.jpg/960px-North_face_of_Mount_Shasta_at_sunset-2175.jpg', cap: 'Mt. Shasta 日落' },
@@ -595,6 +600,23 @@ const activities = {
       '🧀 Tillamook Creamery: 免费参观奶酪工厂 + 冰淇淋 (小朋友最爱)',
       '🎮 Seaside Funland Arcade: 游戏厅+碰碰车+迷你高尔夫 (15min北)',
       '🍬 Bruce\'s Candy Kitchen: 看做太妃糖 + 海水太妃 (镇上)',
+    ],
+  },
+  rainier: {
+    activities: [
+      '🏔️ Paradise: Skyline Trail 野花草甸 (7-8月盛开)',
+      '💦 Myrtle Falls: 72ft瀑布+雪山背景 (最佳拍照点, 步行0.5mi)',
+      '🧊 Nisqually Glacier 冰川观景台 (近距离看冰河)',
+      '🏛️ Longmire Museum: 历史展览 + 游客中心',
+      '🌲 Grove of the Patriarchs: 千年古杉步道 (1.5mi, 平坦)',
+      '🦌 野生动物: 黑熊、麋鹿、旱獭 (Paradise 草甸常见旱獭)',
+    ],
+    kids: [
+      '🎖️ Junior Ranger Program: 完成任务册得徽章 (游客中心免费领, 所有年龄)',
+      '🐿️ Paradise 草甸看旱獭: 胖嘟嘟的 marmot 在步道旁晒太阳, 小朋友超爱',
+      '💦 Myrtle Falls 短步道: 铺设平坦, 推车可达, 瀑布+雪山超震撼',
+      '❄️ 夏天玩雪! Paradise 区域7月仍有积雪, 可以堆雪人',
+      '🔭 游客中心互动展览: 触摸冰川模型+火山科普',
     ],
   },
   seattle: {
@@ -761,13 +783,22 @@ const stopDefs = [
     sights: ['Pike Place Market (扔鱼表演)', 'Space Needle', 'Chihuly Garden and Glass'],
   },
   {
+    id: 'rainier', title: 'Mt. Rainier National Park',
+    subtitle: 'Paradise 野花草甸 · 冰川近景 · Myrtle Falls 瀑布',
+    lat: 46.7856, lng: -121.7353, type: 'sight', icon: '🏔️',
+    driveFrom: '从 Seattle', driveTime: '2h 30min', driveMiles: 100,
+    defaultNights: 1,
+    sights: ['Paradise: 野花草甸 + Skyline Trail', 'Myrtle Falls 瀑布 (步行0.5mi)', 'Nisqually Glacier 冰川观景台', 'Longmire Museum 历史区'],
+    note: 'Cougar Rock 营地7月全满。建议住 Ashford/Packwood 镇酒店或 RV Park。周中去 Paradise 避开人潮',
+  },
+  {
     id: 'return', title: '回程: I-5 南下',
-    subtitle: 'Seattle → Fremont (可选 Mt. Shasta 住一晚)',
+    subtitle: 'Mt. Rainier → Fremont (可选 Mt. Shasta 住一晚)',
     lat: 41.3099, lng: -122.3106, type: 'sight', icon: '🏔️',
-    driveFrom: '从 Seattle 回 Fremont', driveTime: '12h (直达) 或 分两天',
-    driveMiles: 810,
+    driveFrom: '从 Mt. Rainier 回 Fremont', driveTime: '11h (直达) 或 分两天',
+    driveMiles: 750,
     defaultNights: 0,
-    note: '建议在 Mt. Shasta 分段过夜（距 Seattle 7h, 距 Fremont 5h）',
+    note: '建议在 Mt. Shasta 分段过夜（距 Rainier 6h, 距 Fremont 5h）',
     passThrough: true,
   },
 ];
